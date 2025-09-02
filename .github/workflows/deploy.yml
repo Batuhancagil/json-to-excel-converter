@@ -47,12 +47,9 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
+      run: |
+        npm install -g vercel@latest
+        vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
       env:
         VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
         VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.ORG_ID }}
-        vercel-project-id: ${{ secrets.PROJECT_ID }}
-        vercel-args: '--prod'
