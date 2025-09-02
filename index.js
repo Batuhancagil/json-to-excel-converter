@@ -14,8 +14,13 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static('public'));
 
-// Multer configuration for file uploads
-const upload = multer({ dest: 'uploads/' });
+// Multer configuration for file uploads (Serverless compatible)
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+    }
+});
 
 // Store uploaded JSON data temporarily
 let uploadedData = null;
@@ -25,36 +30,43 @@ let availableFields = [];
 let selectionHistory = [];
 const MAX_HISTORY_SIZE = 10;
 
-// Template system
+// Template system (Serverless compatible)
 let templates = [];
-const TEMPLATES_FILE = 'templates.json';
 
-// Load templates from file on startup
-function loadTemplates() {
-    try {
-        if (fs.existsSync(TEMPLATES_FILE)) {
-            const data = fs.readFileSync(TEMPLATES_FILE, 'utf8');
-            templates = JSON.parse(data);
-            console.log(`${templates.length} template yüklendi`);
-        }
-    } catch (error) {
-        console.error('Template yükleme hatası:', error);
-        templates = [];
+// Initialize with sample templates for demo
+function initializeTemplates() {
+    if (templates.length === 0) {
+        templates = [
+            {
+                id: Date.now(),
+                name: "Örnek Müşteri Verileri",
+                description: "Temel müşteri bilgileri için template",
+                fields: ["id", "name", "email", "age"],
+                createdAt: new Date().toISOString(),
+                usageCount: 0
+            },
+            {
+                id: Date.now() + 1,
+                name: "Ürün Listesi",
+                description: "Ürün katalog verileri için template",
+                fields: ["productId", "productName", "price", "category"],
+                createdAt: new Date().toISOString(),
+                usageCount: 0
+            }
+        ];
+        console.log('Örnek template\'ler yüklendi');
     }
 }
 
-// Save templates to file
+// Save templates to memory (serverless compatible)
 function saveTemplates() {
-    try {
-        fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
-        console.log('Templates kaydedildi');
-    } catch (error) {
-        console.error('Template kaydetme hatası:', error);
-    }
+    // In serverless environment, we keep templates in memory
+    // They will be reset on each cold start, but that's acceptable for demo
+    console.log('Templates memory\'de saklandı');
 }
 
-// Load templates on startup
-loadTemplates();
+// Initialize templates on startup
+initializeTemplates();
 
 // Routes
 app.get('/', (req, res) => {
@@ -67,10 +79,10 @@ app.post('/upload', upload.single('jsonFile'), (req, res) => {
         let jsonData;
         
         if (req.file) {
-            // File upload
-            const fileContent = fs.readFileSync(req.file.path, 'utf8');
+            // File upload (Serverless compatible)
+            const fileContent = req.file.buffer.toString('utf8');
             jsonData = JSON.parse(fileContent);
-            fs.unlinkSync(req.file.path); // Clean up uploaded file
+            // No need to clean up in serverless environment
         } else if (req.body.jsonData) {
             // Direct JSON input
             jsonData = JSON.parse(req.body.jsonData);
@@ -287,14 +299,6 @@ app.post('/convert', (req, res) => {
         }
         const filepath = path.join(__dirname, 'downloads', filename);
 
-        // Ensure downloads directory exists
-        if (!fs.existsSync(path.join(__dirname, 'downloads'))) {
-            fs.mkdirSync(path.join(__dirname, 'downloads'));
-        }
-
-        // Write file
-        XLSX.writeFile(workbook, filepath);
-
         // Save selection to history
         const selectionEntry = {
             id: Date.now(),
@@ -312,18 +316,15 @@ app.post('/convert', (req, res) => {
             selectionHistory = selectionHistory.slice(0, MAX_HISTORY_SIZE);
         }
 
-        // Send file for download
-        res.download(filepath, filename, (err) => {
-            if (err) {
-                console.error('Download error:', err);
-            }
-            // Clean up file after download
-            setTimeout(() => {
-                if (fs.existsSync(filepath)) {
-                    fs.unlinkSync(filepath);
-                }
-            }, 5000);
-        });
+        // Create buffer for download (Serverless compatible)
+        const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        
+        // Set headers for file download
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        
+        // Send buffer
+        res.send(excelBuffer);
 
     } catch (error) {
         console.error('Conversion error:', error);
