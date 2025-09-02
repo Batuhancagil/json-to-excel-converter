@@ -141,6 +141,16 @@
             background: linear-gradient(135deg, #17a2b8, #138496);
         }
         
+        /* İndirme butonu için özel stil */
+        #downloadBtn {
+            transition: all 0.3s ease;
+        }
+        
+        #downloadBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+        }
+        
         .btn-warning {
             background: linear-gradient(135deg, #ffc107, #e0a800);
         }
@@ -682,6 +692,7 @@
                 <div class="actions">
                     <button class="btn" onclick="uploadJSON()">📤 JSON Yükle</button>
                     <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
+                    <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
                 </div>
             </div>
 
@@ -952,6 +963,9 @@
                     showFieldSelection();
                     updateHistoryDropdown();
                     updateTemplateDropdown();
+                    
+                    // İndirme butonunu görünür yap
+                    document.getElementById('downloadBtn').style.display = 'inline-block';
                 } else {
                     showStatus(data.error, 'error');
                 }
@@ -1499,6 +1513,10 @@
                         document.getElementById('statsSection').classList.add('hidden');
                         document.getElementById('fieldSelectionSection').classList.add('hidden');
                         document.getElementById('excelFilenameSection').classList.add('hidden');
+                        
+                        // İndirme butonunu gizle
+                        document.getElementById('downloadBtn').style.display = 'none';
+                        
                         showStatus('Veriler temizlendi', 'info');
                         setTimeout(() => {
                             document.getElementById('statusSection').classList.add('hidden');
@@ -1543,6 +1561,46 @@
             
             document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
             showStatus('Örnek veri yüklendi. Şimdi "JSON Yükle" butonuna tıklayın.', 'info');
+        }
+        
+        // JSON'ı TXT olarak indir
+        function downloadJSONAsTxt() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            
+            if (!jsonInput) {
+                showStatus('İndirilecek JSON verisi yok', 'error');
+                return;
+            }
+            
+            try {
+                // JSON'ı formatla
+                const formattedJSON = JSON.stringify(JSON.parse(jsonInput), null, 2);
+                
+                // Blob oluştur
+                const blob = new Blob([formattedJSON], { type: 'text/plain;charset=utf-8' });
+                
+                // Download link oluştur
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Dosya adını oluştur
+                const timestamp = new Date().toISOString().slice(0,19).replace(/:/g,'-');
+                a.download = `json_data_${timestamp}.txt`;
+                
+                // İndirmeyi başlat
+                document.body.appendChild(a);
+                a.click();
+                
+                // Temizlik
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showStatus('JSON başarıyla TXT olarak indirildi!', 'success');
+                
+            } catch (error) {
+                showStatus('JSON formatı geçersiz: ' + error.message, 'error');
+            }
         }
 
         // Initialize
