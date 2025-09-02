@@ -148,7 +148,34 @@
         .btn-sm {
             padding: 6px 15px;
             font-size: 0.8em;
-            margin-left: 10px;
+            margin: 0 5px;
+        }
+        
+        /* Preview Actions Stilleri */
+        .preview-actions {
+            background: #f8fbff;
+            border: 2px solid #4facfe;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons .btn {
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
         }
 
         .array-field {
@@ -462,6 +489,17 @@
             .btn {
                 width: 100%;
             }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .action-buttons .btn {
+                min-width: auto;
+                width: 100%;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -582,15 +620,14 @@
                     </div>
                 </div>
 
-                <div class="actions" style="margin-top: 20px;">
-                    <button class="btn btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
-                    <button class="btn btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
-                    <button class="btn btn-secondary" onclick="expandAllPreviews()">📋 Tüm Detayları Aç</button>
-                    <button class="btn btn-secondary" onclick="collapseAllPreviews()">📁 Tüm Detayları Kapat</button>
-                    
-                    <!-- Debug Butonları -->
-                    <button class="btn btn-info" onclick="copySelectedFields()">📋 Seçilen Alanları Kopyala</button>
-                    <button class="btn btn-warning" onclick="showDebugInfo()">🐛 Debug Bilgileri</button>
+                <!-- İlk Kayıt Önizlemesi Altındaki Butonlar -->
+                <div class="preview-actions" style="margin-top: 20px; text-align: center;">
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
+                        <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
+                        <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
+                        <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
+                    </div>
                 </div>
 
                 <!-- Eski alan seçimi gizlendi -->
