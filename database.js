@@ -22,14 +22,74 @@ function initializeDatabase() {
         });
     }
 
-    // Bağlantıyı test et
+    // Bağlantıyı test et ve tabloları oluştur
     pool.query('SELECT NOW()', (err, res) => {
         if (err) {
             console.error('❌ Veritabanı bağlantı hatası:', err.message);
         } else {
             console.log('✅ PostgreSQL veritabanına bağlandı:', res.rows[0].now);
+            // Tabloları otomatik oluştur
+            createTables();
         }
     });
+}
+
+// Tabloları otomatik oluştur
+async function createTables() {
+    try {
+        // Seçim geçmişi tablosu
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS selection_history (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                fields TEXT[] NOT NULL,
+                field_count INTEGER NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ selection_history tablosu oluşturuldu');
+
+        // Template'ler tablosu
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS templates (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                description TEXT,
+                fields TEXT[] NOT NULL,
+                usage_count INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ templates tablosu oluşturuldu');
+
+        // Index'ler
+        await pool.query(`
+            CREATE INDEX IF NOT EXISTS idx_selection_history_timestamp 
+            ON selection_history(timestamp)
+        `);
+        await pool.query(`
+            CREATE INDEX IF NOT EXISTS idx_templates_name 
+            ON templates(name)
+        `);
+        await pool.query(`
+            CREATE INDEX IF NOT EXISTS idx_templates_usage 
+            ON templates(usage_count)
+        `);
+        console.log('✅ Index\'ler oluşturuldu');
+
+        // Örnek template'ler ekle
+        await pool.query(`
+            INSERT INTO templates (name, description, fields) VALUES 
+            ('Müşteri Verileri', 'Temel müşteri bilgileri için template', ARRAY['id', 'name', 'email', 'phone']),
+            ('Ürün Listesi', 'Ürün katalog bilgileri için template', ARRAY['id', 'name', 'price', 'category', 'stock'])
+            ON CONFLICT (name) DO NOTHING
+        `);
+        console.log('✅ Örnek template\'ler eklendi');
+
+    } catch (error) {
+        console.error('❌ Tablo oluşturma hatası:', error.message);
+    }
 }
 
 // Seçim geçmişi işlemleri
