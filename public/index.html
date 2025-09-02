@@ -365,6 +365,57 @@
             background: #f8f9fa;
             border-bottom: 1px solid #e9ecef;
         }
+        
+        /* Akıllı seçim alanları için özel stiller */
+        .smart-field-tag {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .smart-field-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            border-color: #28a745 !important;
+        }
+        
+        .smart-field-tag.selected {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+            color: white !important;
+            border-color: #155724 !important;
+            transform: scale(1.05);
+        }
+        
+        .smart-suggestion-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .smart-suggestion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            border-color: #ffc107 !important;
+        }
+        
+        .smart-suggestion-btn.selected {
+            background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+            color: white !important;
+            border-color: #856404 !important;
+            transform: scale(1.05);
+        }
+        
+        /* Seçili alanlar için görsel vurgulama */
+        .smart-selected {
+            background: linear-gradient(135deg, #4facfe, #00f2fe) !important;
+            color: white !important;
+            border: 2px solid #007bff !important;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4) !important;
+        }
+        
+        .smart-selected label {
+            color: white !important;
+            font-weight: 600 !important;
+        }
 
         .array-field {
             background: #f0f9ff;
@@ -1912,7 +1963,7 @@
                         <h5 style="color: #28a745; margin-bottom: 10px;">✅ Eşleşen Alanlar (${data.matchedFields.length})</h5>
                         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                             ${data.matchedFields.map(field => `
-                                <span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                <span class="smart-field-tag" data-field="${field}" onclick="selectSingleField('${field}')" style="background: #d4edda; color: #155724; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent;">
                                     ${field}
                                 </span>
                             `).join('')}
@@ -1934,8 +1985,8 @@
                                 <strong>${suggestion.reference}</strong> için:
                                 <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
                                     ${suggestion.suggestions.map(suggestionField => `
-                                        <button class="btn btn-sm" onclick="selectSingleField('${suggestionField}')" 
-                                                style="background: #ffc107; color: #212529; font-size: 11px;">
+                                        <button class="btn btn-sm smart-suggestion-btn" onclick="selectSingleField('${suggestionField}')" 
+                                                data-field="${suggestionField}" style="background: #ffc107; color: #212529; font-size: 11px; transition: all 0.2s ease; border: 2px solid transparent;">
                                             ${suggestionField}
                                         </button>
                                     `).join('')}
@@ -1961,6 +2012,9 @@
                 checkbox.checked = false;
             });
             
+            // Önceki vurgulamaları temizle
+            clearAllFieldHighlights();
+            
             // Seçilen alanları işaretle
             fields.forEach(field => {
                 const checkbox = document.querySelector(`#previewContainer input[value="${field}"]`);
@@ -1969,23 +2023,94 @@
                     // Ana checkbox'ları da senkronize et
                     const mainCheckbox = document.querySelector(`input[value="${field}"]`);
                     if (mainCheckbox) mainCheckbox.checked = true;
+                    // Seçili alanı görsel olarak vurgula
+                    highlightSelectedField(field);
                 }
             });
             
             updateSelectedCount();
+            showStatus(`${fields.length} alan akıllı seçim ile seçildi`, 'success');
+        }
         }
 
         function selectSingleField(fieldName) {
             const checkbox = document.querySelector(`#previewContainer input[value="${fieldName}"]`);
             if (checkbox) {
-                checkbox.checked = true;
+                // Toggle: Eğer zaten seçiliyse kaldır, değilse seç
+                const wasChecked = checkbox.checked;
+                checkbox.checked = !wasChecked;
+                
                 // Ana checkbox'ları da senkronize et
                 const mainCheckbox = document.querySelector(`input[value="${fieldName}"]`);
-                if (mainCheckbox) mainCheckbox.checked = true;
+                if (mainCheckbox) mainCheckbox.checked = checkbox.checked;
+                
                 updateSelectedCount();
-                showStatus(`"${fieldName}" alanı seçildi`, 'success');
+                
+                if (checkbox.checked) {
+                    showStatus(`"${fieldName}" alanı seçildi`, 'success');
+                    // Seçili alanı görsel olarak vurgula
+                    highlightSelectedField(fieldName);
+                    // Akıllı seçim sonuçlarında da vurgula
+                    highlightSmartMatchField(fieldName);
+                } else {
+                    showStatus(`"${fieldName}" alanı kaldırıldı`, 'info');
+                    // Vurgulamayı kaldır
+                    removeFieldHighlight(fieldName);
+                    // Akıllı seçim sonuçlarından da kaldır
+                    removeSmartMatchHighlight(fieldName);
+                }
             } else {
                 showStatus(`"${fieldName}" alanı bulunamadı`, 'error');
+            }
+        }
+        
+        // Seçili alanları görsel olarak vurgula
+        function highlightSelectedField(fieldName) {
+            const fieldElement = document.querySelector(`#previewContainer [data-field="${fieldName}"]`);
+            if (fieldElement) {
+                fieldElement.classList.add('smart-selected');
+            }
+        }
+        
+        // Alan vurgulamasını kaldır
+        function removeFieldHighlight(fieldName) {
+            const fieldElement = document.querySelector(`#previewContainer [data-field="${fieldName}"]`);
+            if (fieldElement) {
+                fieldElement.classList.remove('smart-selected');
+            }
+        }
+        
+        // Tüm alan vurgulamalarını temizle
+        function clearAllFieldHighlights() {
+            const highlightedFields = document.querySelectorAll('#previewContainer .smart-selected');
+            highlightedFields.forEach(field => {
+                field.classList.remove('smart-selected');
+            });
+        }
+        
+        // Akıllı seçim sonuçlarında alanı vurgula
+        function highlightSmartMatchField(fieldName) {
+            const smartTag = document.querySelector(`.smart-field-tag[data-field="${fieldName}"]`);
+            const suggestionBtn = document.querySelector(`.smart-suggestion-btn[data-field="${fieldName}"]`);
+            
+            if (smartTag) {
+                smartTag.classList.add('selected');
+            }
+            if (suggestionBtn) {
+                suggestionBtn.classList.add('selected');
+            }
+        }
+        
+        // Akıllı seçim sonuçlarından vurgulamayı kaldır
+        function removeSmartMatchHighlight(fieldName) {
+            const smartTag = document.querySelector(`.smart-field-tag[data-field="${fieldName}"]`);
+            const suggestionBtn = document.querySelector(`.smart-suggestion-btn[data-field="${fieldName}"]`);
+            
+            if (smartTag) {
+                smartTag.classList.remove('selected');
+            }
+            if (suggestionBtn) {
+                suggestionBtn.classList.remove('selected');
             }
         }
 
