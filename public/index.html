@@ -195,6 +195,12 @@
             z-index: 10;
         }
         
+        /* Preview Container için ek stiller */
+        #previewContainer {
+            max-height: 700px !important;
+            min-height: 300px;
+        }
+        
         .preview-actions-fixed .action-buttons {
             margin: 0;
         }
@@ -633,6 +639,11 @@
                 width: 100%;
                 max-width: 200px;
             }
+            
+            #previewContainer {
+                max-height: 500px !important;
+                min-height: 200px;
+            }
         }
     </style>
 </head>
@@ -707,7 +718,7 @@
                     <h3>👁️ İlk Kayıt Önizlemesi</h3>
                     <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
                     <div class="preview-wrapper">
-                        <div id="previewContainer" style="max-height: 500px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
+                        <div id="previewContainer" style="max-height: 700px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
                         <!-- Sabit Butonlar -->
                         <div class="preview-actions-fixed">
                             <div class="action-buttons">
