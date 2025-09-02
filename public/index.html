@@ -212,6 +212,7 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         .history-label {
@@ -221,17 +222,28 @@
         }
         
         .history-select {
-            padding: 8px 12px;
+            padding: 10px 15px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
-            min-width: 200px;
+            border-radius: 12px;
+            min-width: 250px;
             font-size: 0.9em;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .history-select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-1px);
         }
         
         .quick-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         /* Template Controls Stilleri */
@@ -244,6 +256,7 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         .template-label {
@@ -253,11 +266,21 @@
         }
         
         .template-select {
-            padding: 8px 12px;
+            padding: 10px 15px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
-            min-width: 250px;
+            border-radius: 12px;
+            min-width: 280px;
             font-size: 0.9em;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .template-select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-1px);
         }
 
         .array-field {
@@ -597,6 +620,10 @@
                 justify-content: center;
             }
             
+            .history-controls, .template-controls {
+                text-align: center;
+            }
+            
             .preview-actions-fixed .action-buttons {
                 flex-direction: column;
                 gap: 8px;
@@ -709,7 +736,7 @@
                             <button class="btn btn-sm btn-info" onclick="applySelectedHistory()">✅ Uygula</button>
                         </div>
                         
-                        <!-- Hızlı Butonlar -->
+                        <!-- Hızlı Butonlar - Yan Yana -->
                         <div class="quick-actions">
                             <button class="btn btn-sm btn-warning" onclick="applyLastSelection()">⚡ Son Seçimi Uygula</button>
                             <button class="btn btn-sm btn-secondary" onclick="smartMatch()">🧠 Akıllı Seçim</button>
