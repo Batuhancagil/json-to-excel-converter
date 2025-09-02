@@ -153,11 +153,11 @@
         
         /* Preview Actions Stilleri */
         .preview-actions {
-            background: #f8fbff;
-            border: 2px solid #4facfe;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin: 0;
         }
         
         .action-buttons {
@@ -620,15 +620,7 @@
                     </div>
                 </div>
 
-                <!-- İlk Kayıt Önizlemesi Altındaki Butonlar -->
-                <div class="preview-actions" style="margin-top: 20px; text-align: center;">
-                    <div class="action-buttons">
-                        <button class="btn btn-sm btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
-                        <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
-                        <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
-                        <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
-                    </div>
-                </div>
+
 
                 <!-- Eski alan seçimi gizlendi -->
                 <div id="fieldsContainer" class="fields-container" style="display: none;"></div>
@@ -991,6 +983,18 @@
                     `;
                 }
             });
+            
+            // Butonları en alta ekle
+            html += `
+                <div class="preview-actions" style="margin-top: 20px; text-align: center; border-top: 2px solid #4facfe; padding-top: 20px;">
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
+                        <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
+                        <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
+                        <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
+                    </div>
+                </div>
+            `;
             
             html += '</div>';
             return html;
