@@ -4,6 +4,7 @@ const XLSX = require('xlsx');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const db = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -65,6 +66,9 @@ function saveTemplates() {
     console.log('Templates memory\'de saklandı');
 }
 
+// Initialize database and templates on startup
+db.initializeDatabase();
+
 // Initialize templates on startup
 initializeTemplates();
 
@@ -106,14 +110,34 @@ app.post('/upload', upload.single('jsonFile'), (req, res) => {
         availableFields = Object.keys(dataArray[0]);
         uploadedData = dataArray;
 
-        res.json({
-            success: true,
-            message: 'JSON verisi başarıyla yüklendi',
-            fieldCount: availableFields.length,
-            recordCount: dataArray.length,
-            fields: availableFields,
-            selectionHistory: selectionHistory,
-            templates: templates
+        // Veritabanından güncel verileri al
+        Promise.all([
+            db.getSelectionHistory(),
+            db.getTemplates()
+        ]).then(([history, dbTemplates]) => {
+            selectionHistory = history;
+            templates = dbTemplates;
+            
+            res.json({
+                success: true,
+                message: 'JSON verisi başarıyla yüklendi',
+                fieldCount: availableFields.length,
+                recordCount: dataArray.length,
+                fields: availableFields,
+                selectionHistory: selectionHistory,
+                templates: templates
+            });
+        }).catch(error => {
+            console.error('Veritabanı veri getirme hatası:', error);
+            res.json({
+                success: true,
+                message: 'JSON verisi başarıyla yüklendi',
+                fieldCount: availableFields.length,
+                recordCount: dataArray.length,
+                fields: availableFields,
+                selectionHistory: selectionHistory,
+                templates: templates
+            });
         });
 
     } catch (error) {
@@ -299,22 +323,16 @@ app.post('/convert', (req, res) => {
         }
         const filepath = path.join(__dirname, 'downloads', filename);
 
-        // Save selection to history
-        const selectionEntry = {
-            id: Date.now(),
-            name: customFilename || `Seçim ${selectionHistory.length + 1}`,
-            fields: selectedFields,
-            timestamp: new Date().toISOString(),
-            fieldCount: selectedFields.length
-        };
+        // Save selection to database
+        const selectionName = customFilename || `Seçim ${new Date().toISOString().slice(0, 19)}`;
         
-        // Add to history (most recent first)
-        selectionHistory.unshift(selectionEntry);
-        
-        // Keep only the most recent selections
-        if (selectionHistory.length > MAX_HISTORY_SIZE) {
-            selectionHistory = selectionHistory.slice(0, MAX_HISTORY_SIZE);
-        }
+        db.saveSelectionHistory(selectionName, selectedFields)
+            .then(savedSelection => {
+                console.log('Seçim geçmişi veritabanına kaydedildi:', savedSelection.id);
+            })
+            .catch(error => {
+                console.error('Seçim geçmişi kaydetme hatası:', error);
+            });
 
         // Create buffer for download (Serverless compatible)
         const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
@@ -334,14 +352,21 @@ app.post('/convert', (req, res) => {
 
 // Get selection history
 app.get('/history', (req, res) => {
-    res.json({ 
-        success: true, 
-        history: selectionHistory 
-    });
+    db.getSelectionHistory()
+        .then(history => {
+            res.json({ 
+                success: true, 
+                history: history 
+            });
+        })
+        .catch(error => {
+            console.error('Seçim geçmişi getirme hatası:', error);
+            res.status(500).json({ error: 'Seçim geçmişi getirilemedi' });
+        });
 });
 
 // Apply previous selection
-app.post('/apply-selection', (req, res) => {
+app.post('/apply-selection', async (req, res) => {
     try {
         const { selectionId } = req.body;
         
@@ -349,7 +374,7 @@ app.post('/apply-selection', (req, res) => {
             return res.status(400).json({ error: 'Seçim ID gerekli' });
         }
         
-        const selection = selectionHistory.find(s => s.id === selectionId);
+        const selection = await db.getSelectionById(parseInt(selectionId));
         if (!selection) {
             return res.status(404).json({ error: 'Seçim bulunamadı' });
         }
@@ -378,18 +403,19 @@ app.post('/apply-selection', (req, res) => {
 });
 
 // Smart field matching
-app.post('/smart-match', (req, res) => {
+app.post('/smart-match', async (req, res) => {
     try {
         if (!uploadedData || availableFields.length === 0) {
             return res.status(400).json({ error: 'Önce JSON verisi yükleyin' });
         }
         
-        // Get the most recent selection as reference
-        if (selectionHistory.length === 0) {
+        // Get the most recent selection as reference from database
+        const history = await db.getSelectionHistory();
+        if (history.length === 0) {
             return res.status(400).json({ error: 'Henüz seçim geçmişi yok' });
         }
         
-        const lastSelection = selectionHistory[0];
+        const lastSelection = history[0];
         const referenceFields = lastSelection.fields;
         
         // Smart matching algorithm
@@ -459,10 +485,17 @@ app.post('/smart-match', (req, res) => {
 
 // Template management endpoints
 app.get('/templates', (req, res) => {
-    res.json({ 
-        success: true, 
-        templates: templates 
-    });
+    db.getTemplates()
+        .then(dbTemplates => {
+            res.json({ 
+                success: true, 
+                templates: dbTemplates 
+            });
+        })
+        .catch(error => {
+            console.error('Template getirme hatası:', error);
+            res.status(500).json({ error: 'Template\'ler getirilemedi' });
+        });
 });
 
 app.post('/save-template', (req, res) => {
@@ -473,29 +506,18 @@ app.post('/save-template', (req, res) => {
             return res.status(400).json({ error: 'Template adı ve alanları gerekli' });
         }
         
-        // Check if template name already exists
-        const existingTemplate = templates.find(t => t.name.toLowerCase() === name.toLowerCase());
-        if (existingTemplate) {
-            return res.status(400).json({ error: 'Bu isimde bir template zaten mevcut' });
-        }
-        
-        const template = {
-            id: Date.now(),
-            name: name.trim(),
-            description: description ? description.trim() : '',
-            fields: fields,
-            createdAt: new Date().toISOString(),
-            usageCount: 0
-        };
-        
-        templates.push(template);
-        saveTemplates();
-        
-        res.json({
-            success: true,
-            message: 'Template başarıyla kaydedildi',
-            template: template
-        });
+        // Save template to database
+        db.saveTemplate(name.trim(), description ? description.trim() : '', fields)
+            .then(savedTemplate => {
+                res.json({
+                    success: true,
+                    message: 'Template başarıyla kaydedildi',
+                    template: savedTemplate
+                });
+            })
+            .catch(error => {
+                res.status(400).json({ error: error.message });
+            });
         
     } catch (error) {
         console.error('Save template error:', error);
@@ -503,7 +525,7 @@ app.post('/save-template', (req, res) => {
     }
 });
 
-app.post('/apply-template', (req, res) => {
+app.post('/apply-template', async (req, res) => {
     try {
         const { templateId } = req.body;
         
@@ -511,7 +533,7 @@ app.post('/apply-template', (req, res) => {
             return res.status(400).json({ error: 'Template ID gerekli' });
         }
         
-        const template = templates.find(t => t.id === templateId);
+        const template = await db.getTemplateById(parseInt(templateId));
         if (!template) {
             return res.status(404).json({ error: 'Template bulunamadı' });
         }
@@ -526,9 +548,8 @@ app.post('/apply-template', (req, res) => {
             !availableFieldsInTemplate.includes(field)
         );
         
-        // Update usage count
-        template.usageCount = (template.usageCount || 0) + 1;
-        saveTemplates();
+        // Update usage count in database
+        await db.updateTemplateUsage(parseInt(templateId));
         
         res.json({
             success: true,
@@ -544,17 +565,14 @@ app.post('/apply-template', (req, res) => {
     }
 });
 
-app.delete('/delete-template/:id', (req, res) => {
+app.delete('/delete-template/:id', async (req, res) => {
     try {
         const templateId = parseInt(req.params.id);
         
-        const templateIndex = templates.findIndex(t => t.id === templateId);
-        if (templateIndex === -1) {
+        const deletedTemplate = await db.deleteTemplate(templateId);
+        if (!deletedTemplate) {
             return res.status(404).json({ error: 'Template bulunamadı' });
         }
-        
-        const deletedTemplate = templates.splice(templateIndex, 1)[0];
-        saveTemplates();
         
         res.json({
             success: true,
