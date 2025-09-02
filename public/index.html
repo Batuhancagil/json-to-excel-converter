@@ -178,6 +178,27 @@
             box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
         }
         
+        /* Preview Wrapper ve Sabit Butonlar */
+        .preview-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .preview-actions-fixed {
+            background: #f8fbff;
+            border-top: 2px solid #4facfe;
+            padding: 15px 20px;
+            text-align: center;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        
+        .preview-actions-fixed .action-buttons {
+            margin: 0;
+        }
+        
         /* History Controls Stilleri */
         .history-controls {
             display: flex;
@@ -575,6 +596,16 @@
             .quick-actions {
                 justify-content: center;
             }
+            
+            .preview-actions-fixed .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .preview-actions-fixed .btn {
+                width: 100%;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -648,7 +679,19 @@
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
                     <h3>👁️ İlk Kayıt Önizlemesi</h3>
                     <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
-                    <div id="previewContainer" style="max-height: 400px; overflow-y: auto; background: white; border-radius: 10px; padding: 20px;"></div>
+                    <div class="preview-wrapper">
+                        <div id="previewContainer" style="max-height: 500px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
+                        <!-- Sabit Butonlar -->
+                        <div class="preview-actions-fixed">
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
+                                <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
+                                <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
+                                <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
+                                <button class="btn btn-sm btn-success" onclick="saveCurrentSelectionAsTemplate()">💾 Template Kaydet</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Seçim Geçmişi ve Akıllı Seçim Bölümü -->
@@ -1060,18 +1103,7 @@
                 }
             });
             
-            // Butonları en alta ekle
-            html += `
-                <div class="preview-actions" style="margin-top: 20px; text-align: center; border-top: 2px solid #4facfe; padding-top: 20px;">
-                    <div class="action-buttons">
-                        <button class="btn btn-sm btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
-                        <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
-                        <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
-                        <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
-                        <button class="btn btn-sm btn-success" onclick="saveCurrentSelectionAsTemplate()">💾 Template Kaydet</button>
-                    </div>
-                </div>
-            `;
+
             
             html += '</div>';
             return html;
