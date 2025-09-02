@@ -746,9 +746,9 @@
                 
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📄</div>
-                    <p><strong>JSON dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
+                    <p><strong>JSON veya TXT dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
                     <p style="color: #6c757d; margin-top: 10px;">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
-                    <input type="file" id="fileInput" class="file-input" accept=".json">
+                    <input type="file" id="fileInput" class="file-input" accept=".json,.txt">
                 </div>
 
                 <div style="margin-top: 20px;">
@@ -757,7 +757,7 @@
                 </div>
 
                 <div class="actions">
-                    <button class="btn" onclick="uploadJSON()">📤 JSON Yükle</button>
+                    <button class="btn" onclick="uploadJSON()">📤 Veri Yükle</button>
                     <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
                     <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
                 </div>
@@ -982,48 +982,94 @@
 
         function handleFileUpload() {
             const file = fileInput.files[0];
-            if (file && file.type === 'application/json') {
+            if (file && (file.type === 'application/json' || file.name.endsWith('.txt'))) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('jsonInput').value = e.target.result;
+                    showStatus(`${file.name} dosyası yüklendi. Şimdi "JSON Yükle" butonuna tıklayın.`, 'info');
                 };
                 reader.readAsText(file);
+            } else {
+                showStatus('Sadece JSON veya TXT dosyaları kabul edilir', 'error');
             }
         }
 
-        function uploadJSON() {
+                function uploadJSON() {
             const jsonInput = document.getElementById('jsonInput').value.trim();
+            const fileInput = document.getElementById('fileInput');
             
-            if (!jsonInput) {
+            // Dosya yükleme kontrolü
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        let content = e.target.result;
+                        
+                        // TXT dosyası ise JSON formatına çevirmeye çalış
+                        if (file.name.endsWith('.txt')) {
+                            content = content.trim();
+                            // Eğer content zaten JSON formatında değilse, JSON olarak parse etmeye çalış
+                            try {
+                                JSON.parse(content);
+                            } catch (parseError) {
+                                showStatus('TXT dosyası geçerli JSON formatında olmalıdır', 'error');
+                                return;
+                            }
+                        }
+                        
+                        // JSON formatını kontrol et
+                        const jsonData = JSON.parse(content);
+                        
+                        // Backend'e gönder
+                        sendToBackend(content, jsonData);
+                        
+                    } catch (error) {
+                        showStatus('Dosya formatı geçersiz: ' + error.message, 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                
+            } else if (jsonInput) {
+                // Textarea'dan veri alma
+                try {
+                    const jsonData = JSON.parse(jsonInput);
+                    sendToBackend(jsonInput, jsonData);
+                } catch (error) {
+                    showStatus('JSON formatı geçersiz: ' + error.message, 'error');
+                }
+            } else {
                 showStatus('Lütfen JSON verisi girin veya dosya yükleyin', 'error');
-                return;
             }
-
-            showStatus('JSON verisi yükleniyor...', 'info');
-
+        }
+        
+        // Backend'e veri gönderme fonksiyonu
+        function sendToBackend(jsonString, jsonData) {
+            showStatus('Veri yükleniyor...', 'info');
+            
             fetch('/upload', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ jsonData: jsonInput })
+                body: JSON.stringify({ jsonData: jsonString })
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Backend response:', data); // Debug log
+                console.log('Backend response:', data);
                 
                 if (data.success) {
-                    // Backend'den gelen data'yı parse et
-                    const jsonData = JSON.parse(jsonInput);
-                    uploadedData = jsonData; // Doğrudan JSON verisini kullan
+                    uploadedData = jsonData;
                     availableFields = data.fields;
                     selectionHistory = data.selectionHistory || [];
                     templates = data.templates || [];
                     
-                    console.log('uploadedData set edildi:', uploadedData); // Debug log
-                    console.log('availableFields:', availableFields); // Debug log
-                    console.log('selectionHistory:', selectionHistory); // Debug log
-                    console.log('templates:', templates); // Debug log
+                    console.log('uploadedData set edildi:', uploadedData);
+                    console.log('availableFields:', availableFields);
+                    console.log('selectionHistory:', selectionHistory);
+                    console.log('templates:', templates);
                     
                     showStatus(data.message, 'success');
                     showStats(jsonData);
@@ -1033,12 +1079,15 @@
                     
                     // İndirme butonunu görünür yap
                     document.getElementById('downloadBtn').style.display = 'inline-block';
+                    
+                    // Dosya input'unu temizle
+                    document.getElementById('fileInput').value = '';
                 } else {
                     showStatus(data.error, 'error');
                 }
             })
             .catch(error => {
-                console.error('Upload error:', error); // Debug log
+                console.error('Upload error:', error);
                 showStatus('Hata oluştu: ' + error.message, 'error');
             });
         }
