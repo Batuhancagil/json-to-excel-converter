@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Excel Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 2px;
+        }
+
+        .upload-area {
+            border: 2px dashed #4facfe;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8fbff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #00f2fe;
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #00f2fe;
+            background: #e0f7ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #4facfe;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+
+        .btn-sm {
+            padding: 6px 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .array-field {
+            background: #f0f9ff;
+            border-left: 4px solid #4facfe;
+        }
+
+        .nested-field {
+            background: #fff5f5;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .json-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .json-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .fields-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .field-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .field-checkbox:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+        }
+
+        .field-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4facfe;
+        }
+
+        .field-checkbox label {
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .field-checkbox.selected {
+            border-color: #4facfe;
+            background: #f0f9ff;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.show {
+            display: block;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: white;
+        }
+        
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            opacity: 0.7;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .debug-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .debug-section h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+        
+        .debug-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .debug-note {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin: 10px 0 0 0;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Excel Dosya Adı Stilleri */
+        .excel-filename-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .filename-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .filename-input-group {
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .filename-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px 0 0 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .filename-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .filename-extension {
+            padding: 12px 15px;
+            background: #6c757d;
+            color: white;
+            border-radius: 0 10px 10px 0;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .filename-help {
+            display: block;
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 JSON to Excel Converter</h1>
+            <p>JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin</p>
+        </div>
+
+        <div class="content">
+            <!-- JSON Upload Section -->
+            <div class="section">
+                <h2>📁 JSON Verisi Yükle</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <p><strong>JSON dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
+                    <p style="color: #6c757d; margin-top: 10px;">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".json">
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p><strong>Veya JSON verisi yapıştırın:</strong></p>
+                    <textarea id="jsonInput" class="json-input" placeholder='Örnek: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" onclick="uploadJSON()">📤 JSON Yükle</button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div id="statusSection" class="hidden">
+                <div id="statusMessage" class="status"></div>
+            </div>
+
+            <!-- Stats Section -->
+            <div id="statsSection" class="hidden">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="recordCount">0</div>
+                        <div class="stat-label">Kayıt Sayısı</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="fieldCount">0</div>
+                        <div class="stat-label">Toplam Alan</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="selectedCount">0</div>
+                        <div class="stat-label">Seçilen Alan</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Selection Section -->
+            <div id="fieldSelectionSection" class="section hidden">
+                <h2>✅ Excel'e Dahil Edilecek Alanları Seçin</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.</p>
+                
+                <!-- İlk Kayıt Önizleme -->
+                <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
+                    <h3>👁️ İlk Kayıt Önizlemesi</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
+                    <div id="previewContainer" style="max-height: 400px; overflow-y: auto; background: white; border-radius: 10px; padding: 20px;"></div>
+                </div>
+
+                <!-- Seçim Geçmişi ve Akıllı Seçim Bölümü -->
+                <div id="selectionHistorySection" class="section" style="background: #f0f9ff; border: 2px solid #4facfe; margin-top: 20px;">
+                    <h3>🕒 Seçim Geçmişi ve Akıllı Seçim</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;">Önceki seçimlerinizi kullanarak hızlıca alan seçimi yapabilirsiniz:</p>
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
+                        <!-- Seçim Geçmişi Dropdown -->
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label for="historySelect" style="font-weight: 600; color: #2c3e50;">📚 Seçim Geçmişi:</label>
+                            <select id="historySelect" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; min-width: 200px;">
+                                <option value="">Seçim geçmişi yok</option>
+                            </select>
+                            <button class="btn btn-info" onclick="applySelectedHistory()">✅ Uygula</button>
+                            <button class="btn btn-secondary" onclick="saveCurrentSelectionAsTemplate()">💾 Template Olarak Kaydet</button>
+                        </div>
+                        
+                        <!-- Hızlı Butonlar -->
+                        <button class="btn btn-warning" onclick="applyLastSelection()">⚡ Son Seçimi Uygula</button>
+                        <button class="btn btn-secondary" onclick="smartMatch()">🧠 Akıllı Seçim</button>
+                    </div>
+                    
+                    <!-- Template Bölümü -->
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 10px; border: 1px solid #e9ecef;">
+                        <h4 style="color: #28a745; margin-bottom: 15px;">📋 Kayıtlı Template'ler</h4>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <label for="templateSelect" style="font-weight: 600; color: #2c3e50;">Template:</label>
+                                <select id="templateSelect" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; min-width: 250px;">
+                                    <option value="">Template yok</option>
+                                </select>
+                                <button class="btn btn-success" onclick="applySelectedTemplate()">🚀 Uygula</button>
+                                <button class="btn btn-danger" onclick="deleteSelectedTemplate()">🗑️ Sil</button>
+                            </div>
+                        </div>
+                        <div id="templateInfo" class="hidden" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 0.9em; color: #6c757d;"></div>
+                    </div>
+                    
+                    <!-- Akıllı Seçim Sonuçları -->
+                    <div id="smartMatchResults" class="hidden" style="background: white; padding: 15px; border-radius: 10px; border: 1px solid #e9ecef; margin-top: 15px;">
+                        <h4 style="color: #4facfe; margin-bottom: 10px;">🧠 Akıllı Eşleştirme Sonuçları</h4>
+                        <div id="smartMatchContent"></div>
+                    </div>
+                </div>
+
+                <div class="actions" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="selectAllPreviewFields()">🔘 Tümünü Seç</button>
+                    <button class="btn btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
+                    <button class="btn btn-secondary" onclick="expandAllPreviews()">📋 Tüm Detayları Aç</button>
+                    <button class="btn btn-secondary" onclick="collapseAllPreviews()">📁 Tüm Detayları Kapat</button>
+                    
+                    <!-- Debug Butonları -->
+                    <button class="btn btn-info" onclick="copySelectedFields()">📋 Seçilen Alanları Kopyala</button>
+                    <button class="btn btn-warning" onclick="showDebugInfo()">🐛 Debug Bilgileri</button>
+                </div>
+
+                <!-- Eski alan seçimi gizlendi -->
+                <div id="fieldsContainer" class="fields-container" style="display: none;"></div>
+
+                <!-- Excel Dosya Adı Girişi -->
+                <div id="excelFilenameSection" class="excel-filename-section hidden">
+                    <label for="excelFilename" class="filename-label">📁 Excel Dosya Adı (Opsiyonel):</label>
+                    <div class="filename-input-group">
+                        <input type="text" id="excelFilename" placeholder="ornek_veri" class="filename-input">
+                        <span class="filename-extension">.xlsx</span>
+                    </div>
+                    <small class="filename-help">Boş bırakırsanız otomatik isim kullanılır</small>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" onclick="convertToExcel()" id="convertBtn">
+                        <span class="loading hidden" id="convertLoading"></span>
+                        📊 Excel'e Dönüştür
+                    </button>
+                    <button class="btn btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Modal -->
+    <div id="debugModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🐛 Debug Bilgileri</h3>
+                <span class="close" onclick="closeDebugModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="debug-section">
+                    <h4>📊 Seçilen Alanlar:</h4>
+                    <div id="selectedFieldsDebug" class="debug-text"></div>
+                    <button class="btn btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>📈 Excel Sonuç Bilgileri:</h4>
+                    <div id="excelResultDebug" class="debug-text"></div>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>📁 Sonuç Excel'ini Yükle:</h4>
+                    <input type="file" id="resultExcelFile" accept=".xlsx,.xls" onchange="handleResultExcelUpload(event)">
+                    <p class="debug-note">Sonuç Excel dosyasını yükleyerek debug bilgilerini görebilirsiniz.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Save Modal -->
+    <div id="templateModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💾 Template Kaydet</h3>
+                <span class="close" onclick="closeTemplateModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <label for="templateName" style="display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50;">
+                        Template Adı:
+                    </label>
+                    <input type="text" id="templateName" placeholder="Örn: Müşteri Verileri, Ürün Listesi" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="templateDescription" style="display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50;">
+                        Açıklama (Opsiyonel):
+                    </label>
+                    <textarea id="templateDescription" placeholder="Bu template'in ne için kullanıldığını açıklayın..." 
+                              style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; min-height: 80px; resize: vertical;"></textarea>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4facfe; margin-bottom: 10px;">📋 Seçilen Alanlar:</h4>
+                    <div id="templateFieldsPreview" style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="closeTemplateModal()">❌ İptal</button>
+                    <button class="btn btn-success" onclick="saveTemplate()">💾 Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedData = null;
+        let availableFields = [];
+        let selectionHistory = [];
+        let templates = [];
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileUpload();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload() {
+            const file = fileInput.files[0];
+            if (file && file.type === 'application/json') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('jsonInput').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function uploadJSON() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            
+            if (!jsonInput) {
+                showStatus('Lütfen JSON verisi girin veya dosya yükleyin', 'error');
+                return;
+            }
+
+            showStatus('JSON verisi yükleniyor...', 'info');
+
+            fetch('/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ jsonData: jsonInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Backend response:', data); // Debug log
+                
+                if (data.success) {
+                    // Backend'den gelen data'yı parse et
+                    const jsonData = JSON.parse(jsonInput);
+                    uploadedData = jsonData; // Doğrudan JSON verisini kullan
+                    availableFields = data.fields;
+                    selectionHistory = data.selectionHistory || [];
+                    templates = data.templates || [];
+                    
+                    console.log('uploadedData set edildi:', uploadedData); // Debug log
+                    console.log('availableFields:', availableFields); // Debug log
+                    console.log('selectionHistory:', selectionHistory); // Debug log
+                    console.log('templates:', templates); // Debug log
+                    
+                    showStatus(data.message, 'success');
+                    showStats(jsonData);
+                    showFieldSelection();
+                    updateHistoryDropdown();
+                    updateTemplateDropdown();
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Upload error:', error); // Debug log
+                showStatus('Hata oluştu: ' + error.message, 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            const statusSection = document.getElementById('statusSection');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusMessage.className = `status ${type}`;
+            statusMessage.textContent = message;
+            statusSection.classList.remove('hidden');
+        }
+
+        function showStats(data) {
+            // data yapısını kontrol et
+            let recordCount, fieldCount;
+            
+            if (data.recordCount && data.fieldCount) {
+                // Backend'den gelen format
+                recordCount = data.recordCount;
+                fieldCount = data.fieldCount;
+            } else if (Array.isArray(data)) {
+                // Doğrudan array format
+                recordCount = data.length;
+                fieldCount = data.length > 0 ? Object.keys(data[0]).length : 0;
+            } else {
+                console.error('Beklenmeyen data formatı:', data);
+                return;
+            }
+            
+            document.getElementById('recordCount').textContent = recordCount;
+            document.getElementById('fieldCount').textContent = fieldCount;
+            document.getElementById('selectedCount').textContent = '0';
+            document.getElementById('statsSection').classList.remove('hidden');
+        }
+
+        function isArrayField(fieldName) {
+            if (!uploadedData) return false;
+            
+            let firstRecord;
+            if (uploadedData.data) {
+                firstRecord = uploadedData.data[0];
+            } else if (Array.isArray(uploadedData)) {
+                firstRecord = uploadedData[0];
+            } else {
+                return false;
+            }
+            
+            return firstRecord && Array.isArray(firstRecord[fieldName]);
+        }
+
+        function showFieldSelection() {
+            // İlk kayıt önizlemesini göster
+            showFirstRecordPreview();
+            
+            const container = document.getElementById('fieldsContainer');
+            container.innerHTML = '';
+
+            // Ana alanları göster
+            availableFields.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'field-checkbox';
+                
+                // Array alanları için özel işaretleme
+                const isArray = isArrayField(field);
+                const fieldLabel = isArray ? `${field} (Array)` : field;
+                
+                fieldDiv.innerHTML = `
+                    <input type="checkbox" id="field_${field}" value="${field}" onchange="updateSelectedCount()">
+                    <label for="field_${field}">${fieldLabel}</label>
+                    ${isArray ? `<button class="btn btn-sm" onclick="toggleArrayFields('${field}')">📋 Alt Alanları Göster</button>` : ''}
+                `;
+                container.appendChild(fieldDiv);
+            });
+
+            // Array alanları için özel bölüm ekle
+            addArrayFieldsSection();
+            
+            // Dosya adı girişini göster
+            document.getElementById('excelFilenameSection').classList.remove('hidden');
+            
+            document.getElementById('fieldSelectionSection').classList.remove('hidden');
+        }
+
+        function showFirstRecordPreview() {
+            console.log('showFirstRecordPreview çağrıldı'); // Debug log
+            console.log('uploadedData:', uploadedData); // Debug log
+            
+            if (!uploadedData) {
+                console.log('uploadedData yok'); // Debug log
+                return;
+            }
+            
+            // uploadedData yapısını kontrol et
+            let firstRecord;
+            if (uploadedData.data) {
+                firstRecord = uploadedData.data[0];
+                console.log('uploadedData.data[0] kullanıldı'); // Debug log
+            } else if (Array.isArray(uploadedData)) {
+                firstRecord = uploadedData[0];
+                console.log('uploadedData[0] kullanıldı'); // Debug log
+            } else {
+                console.error('uploadedData yapısı beklenmeyen format:', uploadedData);
+                return;
+            }
+            
+            if (!firstRecord) {
+                console.error('İlk kayıt bulunamadı');
+                return;
+            }
+            
+            console.log('İlk kayıt bulundu:', firstRecord); // Debug log
+            
+            const container = document.getElementById('previewContainer');
+            if (!container) {
+                console.error('previewContainer bulunamadı'); // Debug log
+                return;
+            }
+            
+            const html = createRecordPreviewHTML(firstRecord, '');
+            console.log('Oluşturulan HTML:', html); // Debug log
+            
+            container.innerHTML = html;
+        }
+
+        function createRecordPreviewHTML(data, prefix = '', level = 0) {
+            if (level > 3) return '<span style="color: #6c757d;">... (çok derin)</span>';
+            
+            let html = '<div style="font-family: monospace; font-size: 13px;">';
+            
+            Object.keys(data).forEach(key => {
+                const value = data[key];
+                const fullKey = prefix ? `${prefix}.${key}` : key;
+                const indent = '&nbsp;'.repeat(level * 4);
+                
+                if (Array.isArray(value)) {
+                    html += `
+                        <div style="margin: 5px 0; padding: 8px; background: #f0f9ff; border-radius: 5px; border-left: 3px solid #4facfe;">
+                            <strong style="color: #4facfe;">${indent}📋 ${key} (Array - ${value.length} öğe)</strong>
+                            <button class="btn btn-sm" onclick="toggleArrayPreview('${fullKey}')" style="margin-left: 10px;">
+                                📖 Detayları Göster
+                            </button>
+                            <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
+                                ${value.length > 0 ? createRecordPreviewHTML(value[0], fullKey, level + 1) : '<span style="color: #6c757d;">Boş array</span>'}
+                            </div>
+                        </div>
+                    `;
+                } else if (typeof value === 'object' && value !== null) {
+                    html += `
+                        <div style="margin: 5px 0; padding: 8px; background: #fff5f5; border-radius: 5px; border-left: 3px solid #ff6b6b;">
+                            <strong style="color: #ff6b6b;">${indent}🔍 ${key} (Object)</strong>
+                            <button class="btn btn-sm" onclick="toggleObjectPreview('${fullKey}')" style="margin-left: 10px;">
+                                📖 Detayları Göster
+                            </button>
+                            <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
+                                ${createRecordPreviewHTML(value, fullKey, level + 1)}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const displayValue = value === null ? 'null' : 
+                                       value === undefined ? 'undefined' : 
+                                       String(value);
+                    const valueType = typeof value;
+                    const valueColor = valueType === 'string' ? '#28a745' : 
+                                     valueType === 'number' ? '#007bff' : 
+                                     valueType === 'boolean' ? '#ffc107' : '#6c757d';
+                    
+                    html += `
+                        <div style="margin: 3px 0; padding: 5px; background: white; border-radius: 3px; border-left: 2px solid ${valueColor};">
+                            <span style="color: #495057;">${indent}${key}:</span>
+                            <span style="color: ${valueColor}; font-weight: bold;"> ${displayValue}</span>
+                            <small style="color: #6c757d; margin-left: 10px;">(${valueType})</small>
+                            <input type="checkbox" id="preview_checkbox_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" 
+                                   value="${fullKey}" onchange="syncCheckboxWithPreview('${fullKey}')" 
+                                   style="margin-left: 15px;">
+                            <label for="preview_checkbox_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="margin-left: 5px; font-size: 12px;">
+                                Excel'e Ekle
+                            </label>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function toggleArrayPreview(fullKey) {
+            const previewId = `preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}`;
+            const previewDiv = document.getElementById(previewId);
+            const button = event.target;
+            
+            if (previewDiv.style.display === 'none') {
+                previewDiv.style.display = 'block';
+                button.textContent = '📖 Detayları Gizle';
+            } else {
+                previewDiv.style.display = 'none';
+                button.textContent = '📖 Detayları Göster';
+            }
+        }
+
+        function toggleObjectPreview(fullKey) {
+            const previewId = `preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}`;
+            const previewDiv = document.getElementById(previewId);
+            const button = event.target;
+            
+            if (previewDiv.style.display === 'none') {
+                previewDiv.style.display = 'block';
+                button.textContent = '📖 Detayları Gizle';
+            } else {
+                previewDiv.style.display = 'none';
+                button.textContent = '📖 Detayları Göster';
+            }
+        }
+
+        function toggleArrayFields(arrayFieldName) {
+            const button = event.target;
+            const isExpanded = button.textContent.includes('Gizle');
+            
+            if (isExpanded) {
+                button.textContent = '📋 Alt Alanları Göster';
+                hideArrayFields(arrayFieldName);
+            } else {
+                button.textContent = '📋 Alt Alanları Gizle';
+                showArrayFields(arrayFieldName);
+            }
+        }
+
+        function expandAllArrays() {
+            availableFields.forEach(field => {
+                if (isArrayField(field)) {
+                    showArrayFields(field);
+                    const button = document.querySelector(`button[onclick="toggleArrayFields('${field}')"]`);
+                    if (button) button.textContent = '📋 Alt Alanları Gizle';
+                }
+            });
+        }
+
+        function collapseAllArrays() {
+            availableFields.forEach(field => {
+                if (isArrayField(field)) {
+                    hideArrayFields(field);
+                    const button = document.querySelector(`button[onclick="toggleArrayFields('${field}')"]`);
+                    if (button) button.textContent = '📋 Alt Alanları Göster';
+                }
+            });
+        }
+
+        function hideArrayFields(arrayFieldName) {
+            const container = document.getElementById('arrayFieldsContainer');
+            const arrayFields = container.querySelectorAll(`[id^="array_${arrayFieldName}_"]`);
+            arrayFields.forEach(field => {
+                field.closest('.field-checkbox').style.display = 'none';
+            });
+        }
+
+        function syncCheckboxWithPreview(fullKey) {
+            // Preview'daki checkbox'ı ana alan seçimi ile senkronize et
+            const previewCheckbox = document.getElementById(`preview_checkbox_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}`);
+            const mainCheckbox = document.querySelector(`input[value="${fullKey}"]`);
+            
+            if (mainCheckbox) {
+                mainCheckbox.checked = previewCheckbox.checked;
+            }
+            
+            updateSelectedCount();
+        }
+
+        function selectAllPreviewFields() {
+            const checkboxes = document.querySelectorAll('#previewContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                // Ana checkbox'ları da senkronize et
+                const mainCheckbox = document.querySelector(`input[value="${checkbox.value}"]`);
+                if (mainCheckbox) mainCheckbox.checked = true;
+            });
+            updateSelectedCount();
+        }
+
+        function deselectAllPreviewFields() {
+            const checkboxes = document.querySelectorAll('#previewContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                // Ana checkbox'ları da senkronize et
+                const mainCheckbox = document.querySelector(`input[value="${checkbox.value}"]`);
+                if (mainCheckbox) mainCheckbox.checked = false;
+            });
+            updateSelectedCount();
+        }
+
+        function expandAllPreviews() {
+            const buttons = document.querySelectorAll('#previewContainer button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('Detayları Göster')) {
+                    button.click();
+                }
+            });
+        }
+
+        function collapseAllPreviews() {
+            const buttons = document.querySelectorAll('#previewContainer button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('Detayları Gizle')) {
+                    button.click();
+                }
+            });
+        }
+
+        function addArrayFieldsSection() {
+            const container = document.getElementById('fieldSelectionSection');
+            
+            // Array alanları bölümü ekle
+            const arraySection = document.createElement('div');
+            arraySection.className = 'section';
+            arraySection.style.marginTop = '20px';
+            arraySection.innerHTML = `
+                <h3>📋 Array İçindeki Alt Alanlar</h3>
+                <p style="color: #6c757d; margin-bottom: 20px;">Array tipindeki alanların içindeki alt alanları seçin</p>
+                <div id="arrayFieldsContainer"></div>
+            `;
+            
+            container.appendChild(arraySection);
+        }
+
+        function showArrayFields(arrayFieldName) {
+            if (!uploadedData || !uploadedData.data) return;
+            
+            const firstRecord = uploadedData.data[0];
+            const arrayData = firstRecord[arrayFieldName];
+            
+            if (!Array.isArray(arrayData) || arrayData.length === 0) return;
+            
+            const firstArrayItem = arrayData[0];
+            const arrayFields = Object.keys(firstArrayItem);
+            
+            const container = document.getElementById('arrayFieldsContainer');
+            container.innerHTML = '';
+
+            // Array alanı başlığı
+            const headerDiv = document.createElement('div');
+            headerDiv.style.marginBottom = '15px';
+            headerDiv.innerHTML = `
+                <h4 style="color: #4facfe; border-bottom: 2px solid #4facfe; padding-bottom: 5px;">
+                    ${arrayFieldName} Array'i - Alt Alanlar
+                </h4>
+            `;
+            container.appendChild(headerDiv);
+
+            // Alt alanları göster
+            arrayFields.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'field-checkbox';
+                fieldDiv.style.marginLeft = '20px';
+                
+                // Nested object kontrolü
+                const isNestedObject = typeof firstArrayItem[field] === 'object' && firstArrayItem[field] !== null;
+                const fieldLabel = isNestedObject ? `${field} (Object)` : field;
+                
+                fieldDiv.innerHTML = `
+                    <input type="checkbox" id="array_${arrayFieldName}_${field}" 
+                           value="${arrayFieldName}.${field}" onchange="updateSelectedCount()">
+                    <label for="array_${arrayFieldName}_${field}">${fieldLabel}</label>
+                    ${isNestedObject ? `<button class="btn btn-sm" onclick="showNestedFields('${arrayFieldName}', '${field}')">🔍 Detay</button>` : ''}
+                `;
+                container.appendChild(fieldDiv);
+            });
+        }
+
+        function showNestedFields(arrayFieldName, objectFieldName) {
+            if (!uploadedData || !uploadedData.data) return;
+            
+            const firstRecord = uploadedData.data[0];
+            const arrayData = firstRecord[arrayFieldName];
+            
+            if (!Array.isArray(arrayData) || arrayData.length === 0) return;
+            
+            const firstArrayItem = arrayData[0];
+            const nestedObject = firstArrayItem[objectFieldName];
+            
+            if (typeof nestedObject !== 'object' || nestedObject === null) return;
+            
+            const nestedFields = Object.keys(nestedObject);
+            
+            // Modal veya popup göster
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.7); z-index: 1000; display: flex; 
+                align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>🔍 ${arrayFieldName}.${objectFieldName} Detayları</h3>
+                        <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove()" 
+                                style="background: #ff6b6b; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer;">
+                            ❌ Kapat
+                        </button>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p><strong>Örnek Veri:</strong></p>
+                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px;">${JSON.stringify(nestedObject, null, 2)}</pre>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p><strong>Mevcut Alanlar:</strong></p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                            ${nestedFields.map(field => `
+                                <div style="background: #e9ecef; padding: 10px; border-radius: 5px; text-align: center;">
+                                    <strong>${field}</strong><br>
+                                    <small>${typeof nestedObject[field]}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <p><strong>Bu alanları Excel'e eklemek için:</strong></p>
+                        <p style="color: #6c757d; font-size: 14px;">
+                            Yukarıdaki "Array İçindeki Alt Alanlar" bölümünde <code>${arrayFieldName}.${objectFieldName}</code> 
+                            alanını seçin. Excel'de her bir alt alan ayrı sütun olarak görünecektir.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function selectAllFields() {
+            const checkboxes = document.querySelectorAll('#fieldsContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                checkbox.closest('.field-checkbox').classList.add('selected');
+            });
+            updateSelectedCount();
+        }
+
+        function deselectAllFields() {
+            const checkboxes = document.querySelectorAll('#fieldsContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.closest('.field-checkbox').classList.remove('selected');
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            // Hem fieldsContainer hem de previewContainer'daki checkbox'ları say
+            const fieldsCheckboxes = document.querySelectorAll('#fieldsContainer input[type="checkbox"]:checked');
+            const previewCheckboxes = document.querySelectorAll('#previewContainer input[type="checkbox"]:checked');
+            
+            const totalSelected = fieldsCheckboxes.length + previewCheckboxes.length;
+            document.getElementById('selectedCount').textContent = totalSelected;
+            
+            // Update visual selection for fields container
+            document.querySelectorAll('#fieldsContainer .field-checkbox').forEach(div => {
+                div.classList.remove('selected');
+            });
+            
+            fieldsCheckboxes.forEach(checkbox => {
+                checkbox.closest('.field-checkbox').classList.add('selected');
+            });
+        }
+        
+        function getSelectedFields() {
+            // Hem fieldsContainer hem de previewContainer'daki seçili alanları al
+            const fieldsSelected = Array.from(document.querySelectorAll('#fieldsContainer input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+            const previewSelected = Array.from(document.querySelectorAll('#previewContainer input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            // Tekrar eden alanları kaldır ve döndür
+            return [...new Set([...fieldsSelected, ...previewSelected])];
+        }
+
+        function convertToExcel() {
+            // getSelectedFields fonksiyonunu kullan
+            const selectedFields = getSelectedFields();
+
+            if (selectedFields.length === 0) {
+                showStatus('En az bir alan seçmelisiniz', 'error');
+                return;
+            }
+
+            const convertBtn = document.getElementById('convertBtn');
+            const loading = document.getElementById('convertLoading');
+            
+            convertBtn.disabled = true;
+            loading.classList.remove('hidden');
+
+            // Kullanıcının girdiği dosya adını al
+            const customFilename = document.getElementById('excelFilename').value.trim();
+            
+            fetch('/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    selectedFields,
+                    customFilename: customFilename || null
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Dönüştürme hatası');
+                });
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Kullanıcının girdiği dosya adını kullan veya default kullan
+                const downloadFilename = customFilename 
+                    ? `${customFilename}.xlsx`
+                    : `converted_data_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xlsx`;
+                
+                a.download = downloadFilename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showStatus('Excel dosyası başarıyla oluşturuldu ve indirildi!', 'success');
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            })
+            .finally(() => {
+                convertBtn.disabled = false;
+                loading.classList.add('hidden');
+            });
+        }
+
+        function clearData() {
+            fetch('/clear', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        uploadedData = null;
+                        availableFields = [];
+                        document.getElementById('jsonInput').value = '';
+                        document.getElementById('statusSection').classList.add('hidden');
+                        document.getElementById('statsSection').classList.add('hidden');
+                        document.getElementById('fieldSelectionSection').classList.add('hidden');
+                        document.getElementById('excelFilenameSection').classList.add('hidden');
+                        showStatus('Veriler temizlendi', 'info');
+                        setTimeout(() => {
+                            document.getElementById('statusSection').classList.add('hidden');
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    showStatus('Hata: ' + error.message, 'error');
+                });
+        }
+
+        function loadSampleData() {
+            const sampleData = [
+                {
+                    "id": 1,
+                    "name": "Ahmet Yılmaz",
+                    "email": "ahmet@example.com",
+                    "age": 28,
+                    "department": "Mühendislik",
+                    "salary": 75000,
+                    "hire_date": "2022-01-15"
+                },
+                {
+                    "id": 2,
+                    "name": "Ayşe Demir",
+                    "email": "ayse@example.com",
+                    "age": 32,
+                    "department": "Pazarlama",
+                    "salary": 65000,
+                    "hire_date": "2021-06-20"
+                },
+                {
+                    "id": 3,
+                    "name": "Mehmet Kaya",
+                    "email": "mehmet@example.com",
+                    "age": 29,
+                    "department": "Satış",
+                    "salary": 60000,
+                    "hire_date": "2022-03-10"
+                }
+            ];
+            
+            document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
+            showStatus('Örnek veri yüklendi. Şimdi "JSON Yükle" butonuna tıklayın.', 'info');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showStatus('JSON verisi yüklemek için yukarıdaki alanları kullanın', 'info');
+        });
+        
+        // Debug fonksiyonları
+        function copySelectedFields() {
+            const selectedFields = getSelectedFields();
+            if (selectedFields.length === 0) {
+                showStatus('Henüz hiç alan seçilmedi', 'error');
+                return;
+            }
+            
+            const fieldsText = selectedFields.join('\n');
+            navigator.clipboard.writeText(fieldsText).then(() => {
+                showStatus('Seçilen alanlar panoya kopyalandı!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = fieldsText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showStatus('Seçilen alanlar panoya kopyalandı!', 'success');
+            });
+        }
+        
+        function showDebugInfo() {
+            const selectedFields = getSelectedFields();
+            const modal = document.getElementById('debugModal');
+            
+            // Seçilen alanları göster
+            document.getElementById('selectedFieldsDebug').textContent = selectedFields.join('\n');
+            
+            // Excel sonuç bilgilerini göster
+            const excelInfo = `Seçilen Alan Sayısı: ${selectedFields.length}\n` +
+                            `Toplam Kayıt Sayısı: ${uploadedData ? (uploadedData.data ? uploadedData.data.length : uploadedData.length) : 0}\n` +
+                            `Seçilen Alanlar:\n${selectedFields.map(field => `- ${field}`).join('\n')}`;
+            
+            document.getElementById('excelResultDebug').textContent = excelInfo;
+            
+            modal.classList.add('show');
+        }
+        
+        function closeDebugModal() {
+            document.getElementById('debugModal').classList.remove('show');
+        }
+        
+        function handleResultExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const resultInfo = `Excel Dosyası: ${file.name}\n` +
+                                 `Boyut: ${(file.size / 1024).toFixed(2)} KB\n` +
+                                 `Yükleme Tarihi: ${new Date().toLocaleString()}\n` +
+                                 `Dosya içeriği yüklendi. Debug için hazır.`;
+                
+                document.getElementById('excelResultDebug').textContent = resultInfo;
+                showStatus('Sonuç Excel dosyası yüklendi!', 'success');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Seçim Geçmişi Fonksiyonları
+        function updateHistoryDropdown() {
+            const historySelect = document.getElementById('historySelect');
+            historySelect.innerHTML = '<option value="">Seçim geçmişi yok</option>';
+            
+            if (selectionHistory.length === 0) {
+                return;
+            }
+            
+            selectionHistory.forEach(selection => {
+                const option = document.createElement('option');
+                option.value = selection.id;
+                option.textContent = `${selection.name} (${selection.fieldCount} alan) - ${new Date(selection.timestamp).toLocaleString()}`;
+                historySelect.appendChild(option);
+            });
+        }
+
+        function applySelectedHistory() {
+            const historySelect = document.getElementById('historySelect');
+            const selectedId = historySelect.value;
+            
+            if (!selectedId) {
+                showStatus('Lütfen bir seçim geçmişi seçin', 'error');
+                return;
+            }
+            
+            fetch('/apply-selection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ selectionId: parseInt(selectedId) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Seçilen alanları checkbox'lara uygula
+                    applyFieldsToCheckboxes(data.appliedFields);
+                    
+                    let message = data.message;
+                    if (data.unavailableFields.length > 0) {
+                        message += `\nMevcut olmayan alanlar: ${data.unavailableFields.join(', ')}`;
+                    }
+                    
+                    showStatus(message, 'success');
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function applyLastSelection() {
+            if (selectionHistory.length === 0) {
+                showStatus('Henüz seçim geçmişi yok', 'error');
+                return;
+            }
+            
+            const lastSelection = selectionHistory[0];
+            
+            fetch('/apply-selection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ selectionId: lastSelection.id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    applyFieldsToCheckboxes(data.appliedFields);
+                    
+                    let message = `Son seçim uygulandı: ${data.message}`;
+                    if (data.unavailableFields.length > 0) {
+                        message += `\nMevcut olmayan alanlar: ${data.unavailableFields.join(', ')}`;
+                    }
+                    
+                    showStatus(message, 'success');
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function smartMatch() {
+            if (selectionHistory.length === 0) {
+                showStatus('Henüz seçim geçmişi yok', 'error');
+                return;
+            }
+            
+            fetch('/smart-match', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSmartMatchResults(data);
+                    showStatus(data.message, 'success');
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function showSmartMatchResults(data) {
+            const resultsDiv = document.getElementById('smartMatchResults');
+            const contentDiv = document.getElementById('smartMatchContent');
+            
+            let html = '';
+            
+            if (data.matchedFields.length > 0) {
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #28a745; margin-bottom: 10px;">✅ Eşleşen Alanlar (${data.matchedFields.length})</h5>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${data.matchedFields.map(field => `
+                                <span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                    ${field}
+                                </span>
+                            `).join('')}
+                        </div>
+                        <button class="btn btn-sm" onclick="applyFieldsToCheckboxes(${JSON.stringify(data.matchedFields).replace(/"/g, '&quot;')})" 
+                                style="margin-top: 10px; background: #28a745; color: white;">
+                            ✅ Bu Alanları Seç
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (data.suggestions.length > 0) {
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #ffc107; margin-bottom: 10px;">💡 Öneriler (${data.suggestions.length})</h5>
+                        ${data.suggestions.map(suggestion => `
+                            <div style="margin-bottom: 10px; padding: 10px; background: #fff3cd; border-radius: 5px;">
+                                <strong>${suggestion.reference}</strong> için:
+                                <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
+                                    ${suggestion.suggestions.map(suggestionField => `
+                                        <button class="btn btn-sm" onclick="selectSingleField('${suggestionField}')" 
+                                                style="background: #ffc107; color: #212529; font-size: 11px;">
+                                            ${suggestionField}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            if (data.matchedFields.length === 0 && data.suggestions.length === 0) {
+                html = '<p style="color: #6c757d;">Hiç eşleşen alan bulunamadı.</p>';
+            }
+            
+            contentDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+        }
+
+        function applyFieldsToCheckboxes(fields) {
+            // Tüm checkbox'ları temizle
+            const allCheckboxes = document.querySelectorAll('#previewContainer input[type="checkbox"]');
+            allCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Seçilen alanları işaretle
+            fields.forEach(field => {
+                const checkbox = document.querySelector(`#previewContainer input[value="${field}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    // Ana checkbox'ları da senkronize et
+                    const mainCheckbox = document.querySelector(`input[value="${field}"]`);
+                    if (mainCheckbox) mainCheckbox.checked = true;
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        function selectSingleField(fieldName) {
+            const checkbox = document.querySelector(`#previewContainer input[value="${fieldName}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+                // Ana checkbox'ları da senkronize et
+                const mainCheckbox = document.querySelector(`input[value="${fieldName}"]`);
+                if (mainCheckbox) mainCheckbox.checked = true;
+                updateSelectedCount();
+                showStatus(`"${fieldName}" alanı seçildi`, 'success');
+            } else {
+                showStatus(`"${fieldName}" alanı bulunamadı`, 'error');
+            }
+        }
+
+        // Template Fonksiyonları
+        function updateTemplateDropdown() {
+            const templateSelect = document.getElementById('templateSelect');
+            templateSelect.innerHTML = '<option value="">Template yok</option>';
+            
+            if (templates.length === 0) {
+                return;
+            }
+            
+            templates.forEach(template => {
+                const option = document.createElement('option');
+                option.value = template.id;
+                option.textContent = `${template.name} (${template.fields.length} alan) - ${template.usageCount || 0} kullanım`;
+                templateSelect.appendChild(option);
+            });
+        }
+
+        function saveCurrentSelectionAsTemplate() {
+            const selectedFields = getSelectedFields();
+            
+            if (selectedFields.length === 0) {
+                showStatus('Önce alan seçimi yapın', 'error');
+                return;
+            }
+            
+            // Template modal'ını aç
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateDescription').value = '';
+            document.getElementById('templateFieldsPreview').textContent = selectedFields.join('\n');
+            document.getElementById('templateModal').classList.add('show');
+        }
+
+        function saveTemplate() {
+            const name = document.getElementById('templateName').value.trim();
+            const description = document.getElementById('templateDescription').value.trim();
+            const selectedFields = getSelectedFields();
+            
+            if (!name) {
+                showStatus('Template adı gerekli', 'error');
+                return;
+            }
+            
+            if (selectedFields.length === 0) {
+                showStatus('Seçilen alan yok', 'error');
+                return;
+            }
+            
+            fetch('/save-template', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: description,
+                    fields: selectedFields
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    templates.push(data.template);
+                    updateTemplateDropdown();
+                    closeTemplateModal();
+                    showStatus(`"${name}" template'i kaydedildi`, 'success');
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function applySelectedTemplate() {
+            const templateSelect = document.getElementById('templateSelect');
+            const selectedId = templateSelect.value;
+            
+            if (!selectedId) {
+                showStatus('Lütfen bir template seçin', 'error');
+                return;
+            }
+            
+            fetch('/apply-template', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ templateId: parseInt(selectedId) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    applyFieldsToCheckboxes(data.appliedFields);
+                    
+                    let message = data.message;
+                    if (data.unavailableFields.length > 0) {
+                        message += `\nMevcut olmayan alanlar: ${data.unavailableFields.join(', ')}`;
+                    }
+                    
+                    showStatus(message, 'success');
+                    updateTemplateDropdown(); // Usage count güncellendi
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function deleteSelectedTemplate() {
+            const templateSelect = document.getElementById('templateSelect');
+            const selectedId = templateSelect.value;
+            
+            if (!selectedId) {
+                showStatus('Lütfen silinecek template seçin', 'error');
+                return;
+            }
+            
+            const template = templates.find(t => t.id == selectedId);
+            if (!template) {
+                showStatus('Template bulunamadı', 'error');
+                return;
+            }
+            
+            if (!confirm(`"${template.name}" template'ini silmek istediğinizden emin misiniz?`)) {
+                return;
+            }
+            
+            fetch(`/delete-template/${selectedId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    templates = templates.filter(t => t.id != selectedId);
+                    updateTemplateDropdown();
+                    showStatus(data.message, 'success');
+                } else {
+                    showStatus(data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Hata: ' + error.message, 'error');
+            });
+        }
+
+        function closeTemplateModal() {
+            document.getElementById('templateModal').classList.remove('show');
+        }
+
+        // Template dropdown değiştiğinde bilgi göster
+        document.addEventListener('DOMContentLoaded', function() {
+            const templateSelect = document.getElementById('templateSelect');
+            if (templateSelect) {
+                templateSelect.addEventListener('change', function() {
+                    const selectedId = this.value;
+                    const templateInfo = document.getElementById('templateInfo');
+                    
+                    if (selectedId) {
+                        const template = templates.find(t => t.id == selectedId);
+                        if (template) {
+                            templateInfo.innerHTML = `
+                                <strong>${template.name}</strong><br>
+                                ${template.description ? template.description + '<br>' : ''}
+                                <strong>Alanlar:</strong> ${template.fields.length}<br>
+                                <strong>Kullanım:</strong> ${template.usageCount || 0} kez<br>
+                                <strong>Oluşturulma:</strong> ${new Date(template.createdAt).toLocaleString()}
+                            `;
+                            templateInfo.classList.remove('hidden');
+                        }
+                    } else {
+                        templateInfo.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
