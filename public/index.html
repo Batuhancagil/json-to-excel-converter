@@ -177,6 +177,67 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
         }
+        
+        /* History Controls Stilleri */
+        .history-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .history-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .history-label {
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+        
+        .history-select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            min-width: 200px;
+            font-size: 0.9em;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Template Controls Stilleri */
+        .template-controls {
+            margin-bottom: 15px;
+        }
+        
+        .template-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .template-label {
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+        
+        .template-select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            min-width: 250px;
+            font-size: 0.9em;
+        }
 
         .array-field {
             background: #f0f9ff;
@@ -500,6 +561,20 @@
                 width: 100%;
                 max-width: 200px;
             }
+            
+            .history-section, .template-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .history-select, .template-select {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .quick-actions {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -581,33 +656,34 @@
                     <h3>🕒 Seçim Geçmişi ve Akıllı Seçim</h3>
                     <p style="color: #6c757d; margin-bottom: 15px;">Önceki seçimlerinizi kullanarak hızlıca alan seçimi yapabilirsiniz:</p>
                     
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
+                    <div class="history-controls">
                         <!-- Seçim Geçmişi Dropdown -->
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label for="historySelect" style="font-weight: 600; color: #2c3e50;">📚 Seçim Geçmişi:</label>
-                            <select id="historySelect" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; min-width: 200px;">
+                        <div class="history-section">
+                            <label for="historySelect" class="history-label">📚 Seçim Geçmişi:</label>
+                            <select id="historySelect" class="history-select">
                                 <option value="">Seçim geçmişi yok</option>
                             </select>
-                            <button class="btn btn-info" onclick="applySelectedHistory()">✅ Uygula</button>
-                            <button class="btn btn-secondary" onclick="saveCurrentSelectionAsTemplate()">💾 Template Olarak Kaydet</button>
+                            <button class="btn btn-sm btn-info" onclick="applySelectedHistory()">✅ Uygula</button>
                         </div>
                         
                         <!-- Hızlı Butonlar -->
-                        <button class="btn btn-warning" onclick="applyLastSelection()">⚡ Son Seçimi Uygula</button>
-                        <button class="btn btn-secondary" onclick="smartMatch()">🧠 Akıllı Seçim</button>
+                        <div class="quick-actions">
+                            <button class="btn btn-sm btn-warning" onclick="applyLastSelection()">⚡ Son Seçimi Uygula</button>
+                            <button class="btn btn-sm btn-secondary" onclick="smartMatch()">🧠 Akıllı Seçim</button>
+                        </div>
                     </div>
                     
                     <!-- Template Bölümü -->
                     <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 10px; border: 1px solid #e9ecef;">
                         <h4 style="color: #28a745; margin-bottom: 15px;">📋 Kayıtlı Template'ler</h4>
-                        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <label for="templateSelect" style="font-weight: 600; color: #2c3e50;">Template:</label>
-                                <select id="templateSelect" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; min-width: 250px;">
+                        <div class="template-controls">
+                            <div class="template-section">
+                                <label for="templateSelect" class="template-label">Template:</label>
+                                <select id="templateSelect" class="template-select">
                                     <option value="">Template yok</option>
                                 </select>
-                                <button class="btn btn-success" onclick="applySelectedTemplate()">🚀 Uygula</button>
-                                <button class="btn btn-danger" onclick="deleteSelectedTemplate()">🗑️ Sil</button>
+                                <button class="btn btn-sm btn-success" onclick="applySelectedTemplate()">🚀 Uygula</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteSelectedTemplate()">🗑️ Sil</button>
                             </div>
                         </div>
                         <div id="templateInfo" class="hidden" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 0.9em; color: #6c757d;"></div>
@@ -992,6 +1068,7 @@
                         <button class="btn btn-sm btn-secondary" onclick="deselectAllPreviewFields()">❌ Tümünü Kaldır</button>
                         <button class="btn btn-sm btn-info" onclick="copySelectedFields()">📋 Kopyala</button>
                         <button class="btn btn-sm btn-warning" onclick="showDebugInfo()">🐛 Debug</button>
+                        <button class="btn btn-sm btn-success" onclick="saveCurrentSelectionAsTemplate()">💾 Template Kaydet</button>
                     </div>
                 </div>
             `;
