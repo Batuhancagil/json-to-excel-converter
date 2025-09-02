@@ -238,14 +238,22 @@
         }
         
         .history-select {
-            padding: 10px 15px;
+            padding: 12px 18px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 15px;
             min-width: 250px;
             font-size: 0.9em;
-            background: white;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .history-select:hover {
+            border-color: #4facfe;
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.15);
+            transform: translateY(-2px);
         }
         
         .history-select:focus {
@@ -282,14 +290,22 @@
         }
         
         .template-select {
-            padding: 10px 15px;
+            padding: 12px 18px;
             border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 15px;
             min-width: 280px;
             font-size: 0.9em;
-            background: white;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .template-select:hover {
+            border-color: #4facfe;
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.15);
+            transform: translateY(-2px);
         }
         
         .template-select:focus {
@@ -297,6 +313,57 @@
             border-color: #4facfe;
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
             transform: translateY(-1px);
+        }
+        
+        /* Dropdown açılan alanları için modern stiller */
+        .history-select option,
+        .template-select option {
+            padding: 12px 16px;
+            background: white;
+            color: #2c3e50;
+            border: none;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+        }
+        
+        .history-select option:hover,
+        .template-select option:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .history-select option:checked,
+        .template-select option:checked {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Dropdown açılan alanı için gölge ve border */
+        .history-select,
+        .template-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234facfe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+        
+        /* Dropdown açılan alanı için özel stiller */
+        .history-select::-ms-expand,
+        .template-select::-ms-expand {
+            display: none;
+        }
+        
+        /* Dropdown açılan alanı için modern görünüm */
+        .history-select:focus option,
+        .template-select:focus option {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .array-field {
