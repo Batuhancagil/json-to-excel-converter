@@ -834,7 +834,6 @@
                 fieldDiv.innerHTML = `
                     <input type="checkbox" id="field_${field}" value="${field}" onchange="updateSelectedCount()">
                     <label for="field_${field}">${fieldLabel}</label>
-                    ${isArray ? `<button class="btn btn-sm" onclick="toggleArrayFields('${field}')">📋 Alt Alanları Göster</button>` : ''}
                 `;
                 container.appendChild(fieldDiv);
             });
@@ -1074,19 +1073,8 @@
         }
 
         function addArrayFieldsSection() {
-            const container = document.getElementById('fieldSelectionSection');
-            
-            // Array alanları bölümü ekle
-            const arraySection = document.createElement('div');
-            arraySection.className = 'section';
-            arraySection.style.marginTop = '20px';
-            arraySection.innerHTML = `
-                <h3>📋 Array İçindeki Alt Alanlar</h3>
-                <p style="color: #6c757d; margin-bottom: 20px;">Array tipindeki alanların içindeki alt alanları seçin</p>
-                <div id="arrayFieldsContainer"></div>
-            `;
-            
-            container.appendChild(arraySection);
+            // Array alanları bölümü gizlendi - artık gösterilmiyor
+            return;
         }
 
         function showArrayFields(arrayFieldName) {
