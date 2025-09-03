@@ -895,8 +895,8 @@
                 
                 <!-- İlk Kayıt Önizleme -->
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
-                    <h3>👁️ İlk Kayıt Önizlemesi</h3>
-                    <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
+                    <h3 id="firstRecordTitle">👁️ İlk Kayıt Önizlemesi</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;" id="firstRecordDescription">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
                     <div class="preview-wrapper">
                         <div id="previewContainer" style="max-height: 700px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
                         <!-- Sabit Butonlar -->
@@ -914,13 +914,13 @@
 
                 <!-- Seçim Geçmişi ve Akıllı Seçim Bölümü -->
                 <div id="selectionHistorySection" class="section" style="background: #f0f9ff; border: 2px solid #4facfe; margin-top: 20px;">
-                    <h3>🕒 Seçim Geçmişi ve Akıllı Seçim</h3>
-                    <p style="color: #6c757d; margin-bottom: 15px;">Önceki seçimlerinizi kullanarak hızlıca alan seçimi yapabilirsiniz:</p>
+                    <h3 id="historyTitle">🕒 Seçim Geçmişi ve Akıllı Seçim</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;" id="historyDescription">Önceki seçimlerinizi kullanarak hızlıca alan seçimi yapabilirsiniz:</p>
                     
                     <div class="history-controls">
                         <!-- Seçim Geçmişi Dropdown -->
                         <div class="history-section">
-                            <label for="historySelect" class="history-label">📚 Seçim Geçmişi:</label>
+                            <label for="historySelect" class="history-label" id="historyLabel">📚 Seçim Geçmişi:</label>
                             <select id="historySelect" class="history-select">
                                 <option value="">Seçim geçmişi yok</option>
                             </select>
@@ -936,10 +936,10 @@
                     
                     <!-- Template Bölümü -->
                     <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 10px; border: 1px solid #e9ecef;">
-                        <h4 style="color: #28a745; margin-bottom: 15px;">📋 Kayıtlı Template'ler</h4>
+                        <h4 style="color: #28a745; margin-bottom: 15px;" id="templatesTitle">📋 Kayıtlı Template'ler</h4>
                         <div class="template-controls">
                             <div class="template-section" style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                                <label for="templateSelect" class="template-label">Template:</label>
+                                <label for="templateSelect" class="template-label" id="templateLabel">Template:</label>
                                 <select id="templateSelect" class="template-select">
                                     <option value="">Template yok</option>
                                 </select>
@@ -964,12 +964,12 @@
 
                 <!-- Excel Dosya Adı Girişi -->
                 <div id="excelFilenameSection" class="excel-filename-section hidden">
-                    <label for="excelFilename" class="filename-label">📁 Excel Dosya Adı (Opsiyonel):</label>
+                    <label for="excelFilename" class="filename-label" id="filenameLabel">📁 Excel Dosya Adı (Opsiyonel):</label>
                     <div class="filename-input-group">
                         <input type="text" id="excelFilename" placeholder="ornek_veri" class="filename-input">
                         <span class="filename-extension">.xlsx</span>
                     </div>
-                    <small class="filename-help">Boş bırakırsanız otomatik isim kullanılır</small>
+                    <small class="filename-help" id="filenameHelp">Boş bırakırsanız otomatik isim kullanılır</small>
                 </div>
 
                 <div class="actions" style="display: flex; justify-content: center; align-items: center;">
@@ -1868,6 +1868,17 @@
                 smartBtn: "🧠 Akıllı Seçim",
                 templateApplyBtn: "🚀 Uygula",
                 templateDeleteBtn: "🗑️ Sil",
+                firstRecordTitle: "👁️ İlk Kayıt Önizlemesi",
+                firstRecordDescription: "Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:",
+                historyTitle: "🕒 Seçim Geçmişi ve Akıllı Seçim",
+                historyDescription: "Önceki seçimlerinizi kullanarak hızlıca alan seçimi yapabilirsiniz:",
+                historyLabel: "📚 Seçim Geçmişi:",
+                templatesTitle: "📋 Kayıtlı Template'ler",
+                templateLabel: "Template:",
+                filenameLabel: "📁 Excel Dosya Adı (Opsiyonel):",
+                filenameHelp: "Boş bırakırsanız otomatik isim kullanılır",
+                noHistoryOption: "Seçim geçmişi yok",
+                noTemplateOption: "Template yok",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
             en: {
@@ -1900,6 +1911,17 @@
                 smartBtn: "🧠 Smart Match",
                 templateApplyBtn: "🚀 Apply",
                 templateDeleteBtn: "🗑️ Delete",
+                firstRecordTitle: "👁️ First Record Preview",
+                firstRecordDescription: "Select which fields from this record you want to add to Excel:",
+                historyTitle: "🕒 Selection History and Smart Match",
+                historyDescription: "Use your previous selections to quickly select fields:",
+                historyLabel: "📚 Selection History:",
+                templatesTitle: "📋 Saved Templates",
+                templateLabel: "Template:",
+                filenameLabel: "📁 Excel File Name (Optional):",
+                filenameHelp: "Leave empty to use automatic name",
+                noHistoryOption: "No selection history",
+                noTemplateOption: "No templates",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
         };
@@ -1937,6 +1959,25 @@
             document.getElementById('smartBtn').textContent = t.smartBtn;
             document.getElementById('templateApplyBtn').textContent = t.templateApplyBtn;
             document.getElementById('templateDeleteBtn').textContent = t.templateDeleteBtn;
+            document.getElementById('firstRecordTitle').textContent = t.firstRecordTitle;
+            document.getElementById('firstRecordDescription').textContent = t.firstRecordDescription;
+            document.getElementById('historyTitle').textContent = t.historyTitle;
+            document.getElementById('historyDescription').textContent = t.historyDescription;
+            document.getElementById('historyLabel').textContent = t.historyLabel;
+            document.getElementById('templatesTitle').textContent = t.templatesTitle;
+            document.getElementById('templateLabel').textContent = t.templateLabel;
+            document.getElementById('filenameLabel').textContent = t.filenameLabel;
+            document.getElementById('filenameHelp').textContent = t.filenameHelp;
+            
+            // Update dropdown options
+            const historySelect = document.getElementById('historySelect');
+            const templateSelect = document.getElementById('templateSelect');
+            if (historySelect && historySelect.options.length > 0) {
+                historySelect.options[0].text = t.noHistoryOption;
+            }
+            if (templateSelect && templateSelect.options.length > 0) {
+                templateSelect.options[0].text = t.noTemplateOption;
+            }
             
             // Update field selection section if visible
             const fieldSection = document.getElementById('fieldSelectionSection');
