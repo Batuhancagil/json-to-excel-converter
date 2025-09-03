@@ -597,4 +597,13 @@ app.post('/clear', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server ${PORT} portunda çalışıyor`);
     console.log(`Tarayıcınızda http://localhost:${PORT} adresini açın`);
+    
+    // Environment bilgisi
+    if (process.env.NODE_ENV === 'preview') {
+        console.log('🧪 Preview Environment: Fallback mode aktif');
+    } else if (process.env.NODE_ENV === 'production') {
+        console.log('🏭 Production Environment: PostgreSQL aktif');
+    } else {
+        console.log('🖥️ Local Environment: PostgreSQL aktif');
+    }
 });
