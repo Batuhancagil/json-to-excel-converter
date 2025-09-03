@@ -2,6 +2,10 @@
 
 Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uygulaması. Seçim geçmişi, template sistemi ve akıllı alan eşleştirme özellikleri ile güçlendirilmiş.
 
+## 🚀 Auto-Deploy Test
+
+GitHub entegrasyonu ile otomatik deploy test ediliyor.
+
 ## ✨ Özellikler
 
 ### 🚀 Temel Özellikler
