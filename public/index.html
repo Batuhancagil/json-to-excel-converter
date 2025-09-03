@@ -1087,14 +1087,14 @@
                                 const jsonData = JSON.parse(content);
                                 // Direkt backend'e gönder
                                 sendToBackend(content, jsonData);
-                                showStatus(`${file.name} dosyası başarıyla yüklendi ve işlendi!`, 'success');
+                                showStatus(`${file.name} ${translations[currentLanguage].fileUploadedSuccessfully}`, 'success');
                             } catch (error) {
-                                showStatus('TXT dosyası geçerli JSON formatında olmalıdır: ' + error.message, 'error');
+                                showStatus(translations[currentLanguage].txtFileInvalidJson + ': ' + error.message, 'error');
                             }
                         } else {
                             // JSON dosyası ise textarea'ya yaz
                             document.getElementById('jsonInput').value = content;
-                            showStatus(`${file.name} dosyası yüklendi. Şimdi "Veri Yükle" butonuna tıklayın.`, 'info');
+                            showStatus(`${file.name} ${translations[currentLanguage].fileUploaded}`, 'info');
                         }
                     };
                     reader.readAsText(file);
@@ -1120,7 +1120,7 @@
                             const jsonData = JSON.parse(content);
                             // Direkt backend'e gönder
                             sendToBackend(content, jsonData);
-                            showStatus(`${file.name} dosyası başarıyla yüklendi ve işlendi!`, 'success');
+                            showStatus(`${file.name} ${translations[currentLanguage].fileUploadedSuccessfully}`, 'success');
                         } catch (error) {
                             showStatus('TXT dosyası geçerli JSON formatında olmalıdır: ' + error.message, 'error');
                         }
@@ -1156,7 +1156,7 @@
                             try {
                                 JSON.parse(content);
                             } catch (parseError) {
-                                showStatus('TXT dosyası geçerli JSON formatında olmalıdır', 'error');
+                                showStatus(translations[currentLanguage].txtFileInvalidJson, 'error');
                 return;
                             }
                         }
@@ -1168,7 +1168,7 @@
                         sendToBackend(content, jsonData);
                         
                     } catch (error) {
-                        showStatus('Dosya formatı geçersiz: ' + error.message, 'error');
+                        showStatus(translations[currentLanguage].fileFormatInvalid + ': ' + error.message, 'error');
                     }
                 };
                 
@@ -1180,7 +1180,7 @@
                     const jsonData = JSON.parse(jsonInput);
                     sendToBackend(jsonInput, jsonData);
                 } catch (error) {
-                    showStatus('JSON formatı geçersiz: ' + error.message, 'error');
+                    showStatus(translations[currentLanguage].jsonFormatInvalid + ': ' + error.message, 'error');
                 }
             } else {
                 showStatus('Lütfen JSON verisi girin veya dosya yükleyin', 'error');
@@ -1189,7 +1189,7 @@
         
         // Backend'e veri gönderme fonksiyonu
         function sendToBackend(jsonString, jsonData) {
-            showStatus('Veri yükleniyor...', 'info');
+            showStatus(translations[currentLanguage].dataLoading, 'info');
 
             fetch('/upload', {
                 method: 'POST',
@@ -1230,7 +1230,7 @@
             })
             .catch(error => {
                 console.error('Upload error:', error);
-                showStatus('Hata oluştu: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].errorOccurred + ': ' + error.message, 'error');
             });
         }
 
@@ -1751,7 +1751,7 @@
                 showStatus('Excel dosyası başarıyla oluşturuldu ve indirildi!', 'success');
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             })
             .finally(() => {
                 convertBtn.disabled = false;
@@ -1879,6 +1879,19 @@
                 filenameHelp: "Boş bırakırsanız otomatik isim kullanılır",
                 noHistoryOption: "Seçim geçmişi yok",
                 noTemplateOption: "Template yok",
+                dataLoading: "Veri yükleniyor...",
+                dataUploadedSuccessfully: "JSON verisi başarıyla yüklendi",
+                fileUploadedSuccessfully: "dosyası başarıyla yüklendi ve işlendi!",
+                fileUploaded: "dosyası yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
+                excelFileDownloaded: "Sonuç Excel dosyası yüklendi!",
+                txtFileInvalidJson: "TXT dosyası geçerli JSON formatında olmalıdır",
+                fileFormatInvalid: "Dosya formatı geçersiz",
+                jsonFormatInvalid: "JSON formatı geçersiz",
+                errorOccurred: "Hata oluştu",
+                error: "Hata",
+                templateNameRequired: "Template adı gerekli",
+                templateSaved: "template'i kaydedildi",
+                templateNotFound: "Template bulunamadı",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
             en: {
@@ -1922,6 +1935,19 @@
                 filenameHelp: "Leave empty to use automatic name",
                 noHistoryOption: "No selection history",
                 noTemplateOption: "No templates",
+                dataLoading: "Data loading...",
+                dataUploadedSuccessfully: "JSON data uploaded successfully",
+                fileUploadedSuccessfully: "file uploaded and processed successfully!",
+                fileUploaded: "file uploaded. Now click \"Upload Data\" button.",
+                excelFileDownloaded: "Excel file downloaded successfully!",
+                txtFileInvalidJson: "TXT file must be in valid JSON format",
+                fileFormatInvalid: "File format is invalid",
+                jsonFormatInvalid: "JSON format is invalid",
+                errorOccurred: "An error occurred",
+                error: "Error",
+                templateNameRequired: "Template name is required",
+                templateSaved: "template saved",
+                templateNotFound: "Template not found",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
         };
@@ -2068,7 +2094,7 @@
                                  `Dosya içeriği yüklendi. Debug için hazır.`;
                 
                 document.getElementById('excelResultDebug').textContent = resultInfo;
-                showStatus('Sonuç Excel dosyası yüklendi!', 'success');
+                showStatus(translations[currentLanguage].excelFileDownloaded, 'success');
             };
             reader.readAsArrayBuffer(file);
         }
@@ -2123,7 +2149,7 @@
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
@@ -2158,7 +2184,7 @@
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
@@ -2184,7 +2210,7 @@
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
@@ -2315,7 +2341,7 @@
             const selectedFields = getSelectedFields();
             
             if (!name) {
-                showStatus('Template adı gerekli', 'error');
+                showStatus(translations[currentLanguage].templateNameRequired, 'error');
                 return;
             }
             
@@ -2341,13 +2367,13 @@
                     templates.push(data.template);
                     updateTemplateDropdown();
                     closeTemplateModal();
-                    showStatus(`"${name}" template'i kaydedildi`, 'success');
+                    showStatus(`"${name}" ${translations[currentLanguage].templateSaved}`, 'success');
                 } else {
                     showStatus(data.error, 'error');
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
@@ -2384,7 +2410,7 @@
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
@@ -2399,7 +2425,7 @@
             
             const template = templates.find(t => t.id == selectedId);
             if (!template) {
-                showStatus('Template bulunamadı', 'error');
+                showStatus(translations[currentLanguage].templateNotFound, 'error');
                 return;
             }
             
@@ -2421,7 +2447,7 @@
                 }
             })
             .catch(error => {
-                showStatus('Hata: ' + error.message, 'error');
+                showStatus(translations[currentLanguage].error + ': ' + error.message, 'error');
             });
         }
 
