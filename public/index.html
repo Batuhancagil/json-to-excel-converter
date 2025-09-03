@@ -222,19 +222,19 @@
         }
 
         .slider-text.tr {
-            opacity: 1;
+            opacity: 0.7;
         }
 
         .slider-text.en {
-            opacity: 0.7;
+            opacity: 1;
         }
 
         input:checked + .slider .slider-text.tr {
-            opacity: 0.7;
+            opacity: 1;
         }
 
         input:checked + .slider .slider-text.en {
-            opacity: 1;
+            opacity: 0.7;
         }
 
         .btn-sm {
@@ -809,7 +809,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <h1 id="headerTitle">🔄 JSON to Excel Converter</h1>
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
@@ -819,7 +819,7 @@
                         <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <div class="language-switch">
+                <div class="language-switch" style="position: absolute; right: 0;">
                     <label class="switch">
                         <input type="checkbox" id="languageToggle" onchange="toggleLanguage()">
                         <span class="slider">
@@ -919,9 +919,9 @@
                         
                         <!-- Hızlı Butonlar - Yan Yana -->
                         <div class="quick-actions">
-                            <button class="btn btn-sm btn-info" onclick="applySelectedHistory()">✅ Uygula</button>
-                            <button class="btn btn-sm btn-warning" onclick="applyLastSelection()">⚡ Son Seçimi Uygula</button>
-                            <button class="btn btn-sm btn-secondary" onclick="smartMatch()">🧠 Akıllı Seçim</button>
+                            <button class="btn btn-sm btn-info" onclick="applySelectedHistory()" id="applyBtn">✅ Uygula</button>
+                            <button class="btn btn-sm btn-warning" onclick="applyLastSelection()" id="applyLastBtn">⚡ Son Seçimi Uygula</button>
+                            <button class="btn btn-sm btn-secondary" onclick="smartMatch()" id="smartBtn">🧠 Akıllı Seçim</button>
                         </div>
                     </div>
                     
@@ -934,8 +934,8 @@
                                 <select id="templateSelect" class="template-select">
                                     <option value="">Template yok</option>
                                 </select>
-                                <button class="btn btn-sm btn-success" onclick="applySelectedTemplate()">🚀 Uygula</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteSelectedTemplate()">🗑️ Sil</button>
+                                <button class="btn btn-sm btn-success" onclick="applySelectedTemplate()" id="templateApplyBtn">🚀 Uygula</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteSelectedTemplate()" id="templateDeleteBtn">🗑️ Sil</button>
                             </div>
                         </div>
                         <div id="templateInfo" class="hidden" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 0.9em; color: #6c757d;"></div>
@@ -1841,6 +1841,11 @@
                 saveTemplate: "💾 Template Kaydet",
                 convertBtn: "📊 Excel'e Dönüştür",
                 clearBtn: "🗑️ Verileri Temizle",
+                applyBtn: "✅ Uygula",
+                applyLastBtn: "⚡ Son Seçimi Uygula",
+                smartBtn: "🧠 Akıllı Seçim",
+                templateApplyBtn: "🚀 Uygula",
+                templateDeleteBtn: "🗑️ Sil",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
             en: {
@@ -1868,15 +1873,20 @@
                 saveTemplate: "💾 Save Template",
                 convertBtn: "📊 Convert to Excel",
                 clearBtn: "🗑️ Clear Data",
+                applyBtn: "✅ Apply",
+                applyLastBtn: "⚡ Apply Last Selection",
+                smartBtn: "🧠 Smart Match",
+                templateApplyBtn: "🚀 Apply",
+                templateDeleteBtn: "🗑️ Delete",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
         };
 
-        let currentLanguage = 'tr';
+        let currentLanguage = 'en';
 
         function toggleLanguage() {
             const toggle = document.getElementById('languageToggle');
-            currentLanguage = toggle.checked ? 'en' : 'tr';
+            currentLanguage = toggle.checked ? 'tr' : 'en';
             updateLanguage();
         }
 
@@ -1901,6 +1911,11 @@
             document.getElementById('fieldSelectionDescription').textContent = t.fieldSelectionDescription;
             document.getElementById('convertBtnText').textContent = t.convertBtn;
             document.getElementById('clearBtnText').textContent = t.clearBtn;
+            document.getElementById('applyBtn').textContent = t.applyBtn;
+            document.getElementById('applyLastBtn').textContent = t.applyLastBtn;
+            document.getElementById('smartBtn').textContent = t.smartBtn;
+            document.getElementById('templateApplyBtn').textContent = t.templateApplyBtn;
+            document.getElementById('templateDeleteBtn').textContent = t.templateDeleteBtn;
             
             // Update field selection section if visible
             const fieldSection = document.getElementById('fieldSelectionSection');
