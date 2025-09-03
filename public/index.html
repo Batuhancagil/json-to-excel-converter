@@ -155,6 +155,88 @@
             background: linear-gradient(135deg, #ffc107, #e0a800);
         }
 
+        /* Language Switch Styles */
+        .language-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 35px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transition: .4s;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(45px);
+        }
+
+        .slider-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        .slider-text.tr {
+            opacity: 1;
+        }
+
+        .slider-text.en {
+            opacity: 0.7;
+        }
+
+        input:checked + .slider .slider-text.tr {
+            opacity: 0.7;
+        }
+
+        input:checked + .slider .slider-text.en {
+            opacity: 1;
+        }
+
         .btn-sm {
             padding: 6px 15px;
             font-size: 0.8em;
@@ -727,38 +809,49 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
-            <h1>🔄 JSON to Excel Converter</h1>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
-                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
-                    <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
-                    <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <h1 id="headerTitle">🔄 JSON to Excel Converter</h1>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
+                        <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="language-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="languageToggle" onchange="toggleLanguage()">
+                        <span class="slider">
+                            <span class="slider-text tr">TR</span>
+                            <span class="slider-text en">EN</span>
+                        </span>
+                    </label>
+                </div>
             </div>
-            <p>JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin</p>
+            <p id="headerDescription">JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin</p>
         </div>
 
         <div class="content">
             <!-- JSON Upload Section -->
             <div class="section">
-                <h2>📁 JSON Verisi Yükle</h2>
+                <h2 id="uploadTitle">📁 JSON Verisi Yükle</h2>
                 
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📄</div>
-                    <p><strong>JSON veya TXT dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
-                    <p style="color: #6c757d; margin-top: 10px;">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
+                    <p><strong id="uploadDescription">JSON veya TXT dosyasını buraya sürükleyin</strong> <span id="uploadDescription2">veya tıklayarak seçin</span></p>
+                    <p style="color: #6c757d; margin-top: 10px;" id="uploadDescription3">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
                     <input type="file" id="fileInput" class="file-input" accept=".json,.txt">
                 </div>
 
                 <div style="margin-top: 20px;">
-                    <p><strong>Veya JSON verisi yapıştırın:</strong></p>
+                    <p><strong id="pasteJsonLabel">Veya JSON verisi yapıştırın:</strong></p>
                     <textarea id="jsonInput" class="json-input" placeholder='Örnek: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
                 </div>
 
                 <div class="actions">
-                    <button class="btn" onclick="uploadJSON()">📤 Veri Yükle</button>
-                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
+                    <button class="btn" onclick="uploadJSON()" id="uploadBtn">📤 Veri Yükle</button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()" id="sampleBtn">📋 Örnek Veri</button>
                     <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
                 </div>
             </div>
@@ -773,23 +866,23 @@
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number" id="recordCount">0</div>
-                        <div class="stat-label">Kayıt Sayısı</div>
+                        <div class="stat-label" id="recordLabel">Kayıt Sayısı</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="fieldCount">0</div>
-                        <div class="stat-label">Toplam Alan</div>
+                        <div class="stat-label" id="fieldLabel">Toplam Alan</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="selectedCount">0</div>
-                        <div class="stat-label">Seçilen Alan</div>
+                        <div class="stat-label" id="selectedLabel">Seçilen Alan</div>
                     </div>
                 </div>
             </div>
 
             <!-- Field Selection Section -->
             <div id="fieldSelectionSection" class="section hidden">
-                <h2>✅ Excel'e Dahil Edilecek Alanları Seçin</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.</p>
+                <h2 id="fieldSelectionTitle">✅ Excel'e Dahil Edilecek Alanları Seçin</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;" id="fieldSelectionDescription">İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.</p>
                 
                 <!-- İlk Kayıt Önizleme -->
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
@@ -873,9 +966,11 @@
                 <div class="actions">
                     <button class="btn" onclick="convertToExcel()" id="convertBtn">
                         <span class="loading hidden" id="convertLoading"></span>
-                        📊 Excel'e Dönüştür
+                        <span id="convertBtnText">📊 Excel'e Dönüştür</span>
                     </button>
-                    <button class="btn btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
+                    <button class="btn btn-danger" onclick="clearData()" id="clearBtn">
+                        <span id="clearBtnText">🗑️ Verileri Temizle</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1719,9 +1814,117 @@
             }
         }
 
+        // Language translations
+        const translations = {
+            tr: {
+                headerTitle: "🔄 JSON to Excel Converter",
+                headerDescription: "JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin",
+                uploadTitle: "📁 JSON Verisi Yükle",
+                uploadDescription: "JSON veya TXT dosyasını buraya sürükleyin",
+                uploadDescription2: "veya tıklayarak seçin",
+                uploadDescription3: "Veya aşağıya doğrudan JSON verisi yapıştırın",
+                pasteJsonLabel: "Veya JSON verisi yapıştırın:",
+                uploadBtn: "📤 Veri Yükle",
+                sampleBtn: "📋 Örnek Veri",
+                downloadBtn: "📥 JSON'ı TXT Olarak İndir",
+                recordLabel: "Kayıt Sayısı",
+                fieldLabel: "Toplam Alan",
+                selectedLabel: "Seçilen Alan",
+                fieldSelectionTitle: "✅ Excel'e Dahil Edilecek Alanları Seçin",
+                fieldSelectionDescription: "İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.",
+                firstRecordTitle: "👁️ İlk Kayıt Önizlemesi",
+                firstRecordDescription: "Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:",
+                selectAll: "🔘 Tümünü Seç",
+                deselectAll: "❌ Tümünü Kaldır",
+                copy: "📋 Kopyala",
+                debug: "🐛 Debug",
+                saveTemplate: "💾 Template Kaydet",
+                convertBtn: "📊 Excel'e Dönüştür",
+                clearBtn: "🗑️ Verileri Temizle",
+                useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
+            },
+            en: {
+                headerTitle: "🔄 JSON to Excel Converter",
+                headerDescription: "Convert your JSON data to Excel format and select the fields you want",
+                uploadTitle: "📁 Upload JSON Data",
+                uploadDescription: "Drag and drop JSON or TXT file here",
+                uploadDescription2: "or click to select",
+                uploadDescription3: "Or paste JSON data directly below",
+                pasteJsonLabel: "Or paste JSON data:",
+                uploadBtn: "📤 Upload Data",
+                sampleBtn: "📋 Sample Data",
+                downloadBtn: "📥 Download JSON as TXT",
+                recordLabel: "Record Count",
+                fieldLabel: "Total Fields",
+                selectedLabel: "Selected Fields",
+                fieldSelectionTitle: "✅ Select Fields to Include in Excel",
+                fieldSelectionDescription: "Review the first record's data and mark the fields you want. Selected fields will be included in the Excel file.",
+                firstRecordTitle: "👁️ First Record Preview",
+                firstRecordDescription: "Select which fields from this record you want to add to Excel:",
+                selectAll: "🔘 Select All",
+                deselectAll: "❌ Deselect All",
+                copy: "📋 Copy",
+                debug: "🐛 Debug",
+                saveTemplate: "💾 Save Template",
+                convertBtn: "📊 Convert to Excel",
+                clearBtn: "🗑️ Clear Data",
+                useUploadAreas: "Use the areas above to upload JSON data"
+            }
+        };
+
+        let currentLanguage = 'tr';
+
+        function toggleLanguage() {
+            const toggle = document.getElementById('languageToggle');
+            currentLanguage = toggle.checked ? 'en' : 'tr';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            
+            // Update all text elements
+            document.getElementById('headerTitle').textContent = t.headerTitle;
+            document.getElementById('headerDescription').textContent = t.headerDescription;
+            document.getElementById('uploadTitle').textContent = t.uploadTitle;
+            document.getElementById('uploadDescription').textContent = t.uploadDescription;
+            document.getElementById('uploadDescription2').textContent = t.uploadDescription2;
+            document.getElementById('uploadDescription3').textContent = t.uploadDescription3;
+            document.getElementById('pasteJsonLabel').textContent = t.pasteJsonLabel;
+            document.getElementById('uploadBtn').textContent = t.uploadBtn;
+            document.getElementById('sampleBtn').textContent = t.sampleBtn;
+            document.getElementById('downloadBtn').textContent = t.downloadBtn;
+            document.getElementById('recordLabel').textContent = t.recordLabel;
+            document.getElementById('fieldLabel').textContent = t.fieldLabel;
+            document.getElementById('selectedLabel').textContent = t.selectedLabel;
+            document.getElementById('fieldSelectionTitle').textContent = t.fieldSelectionTitle;
+            document.getElementById('fieldSelectionDescription').textContent = t.fieldSelectionDescription;
+            document.getElementById('convertBtnText').textContent = t.convertBtn;
+            document.getElementById('clearBtnText').textContent = t.clearBtn;
+            
+            // Update field selection section if visible
+            const fieldSection = document.getElementById('fieldSelectionSection');
+            if (fieldSection && !fieldSection.classList.contains('hidden')) {
+                const firstRecordTitle = fieldSection.querySelector('#firstRecordPreview h3');
+                const firstRecordDescription = fieldSection.querySelector('#firstRecordPreview p');
+                if (firstRecordTitle) firstRecordTitle.textContent = t.firstRecordTitle;
+                if (firstRecordDescription) firstRecordDescription.textContent = t.firstRecordDescription;
+            }
+            
+            // Update preview buttons
+            const previewButtons = document.querySelectorAll('.action-buttons .btn');
+            if (previewButtons.length >= 5) {
+                previewButtons[0].textContent = t.selectAll;
+                previewButtons[1].textContent = t.deselectAll;
+                previewButtons[2].textContent = t.copy;
+                previewButtons[3].textContent = t.debug;
+                previewButtons[4].textContent = t.saveTemplate;
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            showStatus('JSON verisi yüklemek için yukarıdaki alanları kullanın', 'info');
+            showStatus(translations[currentLanguage].useUploadAreas, 'info');
         });
         
         // Debug fonksiyonları
