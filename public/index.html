@@ -870,16 +870,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 15px;">
             <h1>🔄 JSON to Excel Converter</h1>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
-                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
-                    <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
-                    <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
+                        <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="languageSelect" style="color: white; font-weight: 500;">🌍 Language:</label>
+                    <select id="languageSelect" onchange="changeLanguage()" style="padding: 8px 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2); color: white; font-weight: 500;">
+                        <option value="en">English</option>
+                        <option value="tr">Türkçe</option>
+                    </select>
+                </div>
             </div>
-            <p>Convert your JSON data to Excel format and select the fields you want</p>
+            <p id="headerDescription">Convert your JSON data to Excel format and select the fields you want</p>
         </div>
 
         <div class="content">
@@ -936,8 +945,8 @@
                 
                 <!-- İlk Kayıt Önizleme -->
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
-                    <h3>👁️ İlk Kayıt Önizlemesi</h3>
-                    <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
+                    <h3 id="firstRecordTitle">👁️ First Record Preview</h3>
+                    <p id="firstRecordDescription" style="color: #6c757d; margin-bottom: 15px;">Select which fields from this record you want to add to Excel:</p>
                     <div class="preview-wrapper">
                         <div id="previewContainer" style="max-height: 700px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
                         <!-- Sabit Butonlar -->
@@ -1247,7 +1256,7 @@
                     console.log('selectionHistory:', selectionHistory);
                     console.log('templates:', templates);
                     
-                    showStatus(data.message, 'success');
+                    showStatus(translations[currentLanguage].dataUploadedSuccessfully, 'success');
                     showStats(jsonData);
                     showFieldSelection();
                     updateHistoryDropdown();
@@ -1898,9 +1907,110 @@
             }
         }
 
+        // Language translations
+        const translations = {
+            en: {
+                headerDescription: "Convert your JSON data to Excel format and select the fields you want",
+                uploadTitle: "📁 Upload JSON Data",
+                uploadDescription: "Drag and drop JSON or TXT file here or click to select",
+                uploadDescription2: "Or paste JSON data directly below",
+                pasteJson: "Or paste JSON data:",
+                uploadData: "📤 Upload Data",
+                sampleData: "📋 Sample Data",
+                downloadJson: "📥 Download JSON as TXT",
+                recordCount: "Record Count",
+                totalFields: "Total Fields",
+                selectedFields: "Selected Fields",
+                selectFieldsTitle: "✅ Select Fields to Include in Excel",
+                selectFieldsDescription: "Review the first record's data and mark the fields you want. Selected fields will be included in the Excel file.",
+                firstRecordTitle: "👁️ First Record Preview",
+                firstRecordDescription: "Select which fields from this record you want to add to Excel:",
+                selectAll: "🔘 Select All",
+                deselectAll: "❌ Deselect All",
+                copy: "📋 Copy",
+                debug: "🐛 Debug",
+                saveTemplate: "💾 Save Template",
+                convertToExcel: "📊 Convert to Excel",
+                clearData: "🗑️ Clear Data",
+                useUploadAreas: "Use the areas above to upload JSON data",
+                dataUploadedSuccessfully: "JSON data uploaded successfully"
+            },
+            tr: {
+                headerDescription: "JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin",
+                uploadTitle: "📁 JSON Verisi Yükle",
+                uploadDescription: "JSON veya TXT dosyasını buraya sürükleyin veya tıklayarak seçin",
+                uploadDescription2: "Veya aşağıya doğrudan JSON verisi yapıştırın",
+                pasteJson: "Veya JSON verisi yapıştırın:",
+                uploadData: "📤 Veri Yükle",
+                sampleData: "📋 Örnek Veri",
+                downloadJson: "📥 JSON'ı TXT Olarak İndir",
+                recordCount: "Kayıt Sayısı",
+                totalFields: "Toplam Alan",
+                selectedFields: "Seçilen Alan",
+                selectFieldsTitle: "✅ Excel'e Dahil Edilecek Alanları Seçin",
+                selectFieldsDescription: "İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.",
+                firstRecordTitle: "👁️ İlk Kayıt Önizlemesi",
+                firstRecordDescription: "Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:",
+                selectAll: "🔘 Tümünü Seç",
+                deselectAll: "❌ Tümünü Kaldır",
+                copy: "📋 Kopyala",
+                debug: "🐛 Debug",
+                saveTemplate: "💾 Template Kaydet",
+                convertToExcel: "📊 Excel'e Dönüştür",
+                clearData: "🗑️ Verileri Temizle",
+                useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın",
+                dataUploadedSuccessfully: "JSON verisi başarıyla yüklendi"
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            currentLanguage = select.value;
+            
+            // Update all text elements
+            document.getElementById('headerDescription').textContent = translations[currentLanguage].headerDescription;
+            document.querySelector('.section h2').textContent = translations[currentLanguage].uploadTitle;
+            document.querySelector('.upload-area p strong').textContent = translations[currentLanguage].uploadDescription;
+            document.querySelector('.upload-area p[style*="color: #6c757d"]').textContent = translations[currentLanguage].uploadDescription2;
+            document.querySelector('p strong').textContent = translations[currentLanguage].pasteJson;
+            document.querySelector('button[onclick="uploadJSON()"]').textContent = translations[currentLanguage].uploadData;
+            document.querySelector('button[onclick="loadSampleData()"]').textContent = translations[currentLanguage].sampleData;
+            document.querySelector('button[onclick="downloadJSONAsTxt()"]').textContent = translations[currentLanguage].downloadJson;
+            document.querySelector('.stat-label').textContent = translations[currentLanguage].recordCount;
+            document.querySelectorAll('.stat-label')[1].textContent = translations[currentLanguage].totalFields;
+            document.querySelectorAll('.stat-label')[2].textContent = translations[currentLanguage].selectedFields;
+            
+            // Update field selection section
+            const fieldSection = document.getElementById('fieldSelectionSection');
+            if (fieldSection && !fieldSection.classList.contains('hidden')) {
+                fieldSection.querySelector('h2').textContent = translations[currentLanguage].selectFieldsTitle;
+                fieldSection.querySelector('p').textContent = translations[currentLanguage].selectFieldsDescription;
+                document.getElementById('firstRecordTitle').textContent = translations[currentLanguage].firstRecordTitle;
+                document.getElementById('firstRecordDescription').textContent = translations[currentLanguage].firstRecordDescription;
+            }
+            
+            // Update buttons
+            const buttons = document.querySelectorAll('.action-buttons .btn');
+            if (buttons.length >= 5) {
+                buttons[0].textContent = translations[currentLanguage].selectAll;
+                buttons[1].textContent = translations[currentLanguage].deselectAll;
+                buttons[2].textContent = translations[currentLanguage].copy;
+                buttons[3].textContent = translations[currentLanguage].debug;
+                buttons[4].textContent = translations[currentLanguage].saveTemplate;
+            }
+            
+            const convertButtons = document.querySelectorAll('.actions .btn');
+            if (convertButtons.length >= 2) {
+                convertButtons[0].textContent = translations[currentLanguage].convertToExcel;
+                convertButtons[1].textContent = translations[currentLanguage].clearData;
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            showStatus('JSON verisi yüklemek için yukarıdaki alanları kullanın', 'info');
+            showStatus(translations[currentLanguage].useUploadAreas, 'info');
         });
         
         // Debug fonksiyonları
