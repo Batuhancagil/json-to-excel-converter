@@ -677,6 +677,53 @@
             margin-top: 20px;
         }
 
+        /* Excel Preview Stilleri */
+        .excel-preview-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .excel-preview-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 400px;
+        }
+        
+        .excel-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+        }
+        
+        .excel-preview-table th {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .excel-preview-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            color: #212529;
+        }
+        
+        .excel-preview-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .excel-preview-table tr:hover {
+            background: #e9ecef;
+        }
+
         /* Excel Dosya Adı Stilleri */
         .excel-filename-section {
             margin: 25px 0;
@@ -962,6 +1009,14 @@
                 <!-- Eski alan seçimi gizlendi -->
                 <div id="fieldsContainer" class="fields-container" style="display: none;"></div>
 
+                <!-- Excel Preview Alanı -->
+                <div id="excelPreviewSection" class="excel-preview-section hidden">
+                    <h4 style="color: #28a745; margin-bottom: 15px;" id="excelPreviewTitle">📊 Excel Preview</h4>
+                    <div id="excelPreviewContainer" class="excel-preview-container">
+                        <p style="color: #6c757d; text-align: center; padding: 20px;" id="excelPreviewEmpty">No fields selected for preview</p>
+                    </div>
+                </div>
+
                 <!-- Excel Dosya Adı Girişi -->
                 <div id="excelFilenameSection" class="excel-filename-section hidden">
                     <label for="excelFilename" class="filename-label" id="filenameLabel">📁 Excel Dosya Adı (Opsiyonel):</label>
@@ -1218,6 +1273,7 @@
                     showFieldSelection();
                     updateHistoryDropdown();
                     updateTemplateDropdown();
+                    updateExcelPreview();
                     
                     // İndirme butonunu görünür yap
                     document.getElementById('downloadBtn').style.display = 'inline-block';
@@ -1497,7 +1553,11 @@
                 mainCheckbox.checked = previewCheckbox.checked;
             }
             
+            // Preview'ı güncelle
+            updateExcelPreview();
+            
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function selectAllPreviewFields() {
@@ -1509,6 +1569,7 @@
                 if (mainCheckbox) mainCheckbox.checked = true;
             });
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function deselectAllPreviewFields() {
@@ -1520,6 +1581,7 @@
                 if (mainCheckbox) mainCheckbox.checked = false;
             });
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function expandAllPreviews() {
@@ -1656,6 +1718,7 @@
                 checkbox.closest('.field-checkbox').classList.add('selected');
             });
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function deselectAllFields() {
@@ -1665,6 +1728,7 @@
                 checkbox.closest('.field-checkbox').classList.remove('selected');
             });
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function updateSelectedCount() {
@@ -1900,6 +1964,8 @@
                 hideDetails: "Detayları Gizle",
                 emptyArray: "Boş array",
                 tooDeep: "çok derin",
+                excelPreviewTitle: "📊 Excel Önizleme",
+                excelPreviewEmpty: "Önizleme için alan seçilmedi",
                 sampleDataLoaded: "Örnek veri yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
@@ -1965,6 +2031,8 @@
                 hideDetails: "Hide Details",
                 emptyArray: "Empty array",
                 tooDeep: "too deep",
+                excelPreviewTitle: "📊 Excel Preview",
+                excelPreviewEmpty: "No fields selected for preview",
                 sampleDataLoaded: "Sample data loaded. Now click \"Upload Data\" button.",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
@@ -2036,6 +2104,13 @@
                 
                 const hideDetailsTexts = document.querySelectorAll('.hide-details-text');
                 hideDetailsTexts.forEach(el => el.textContent = t.hideDetails);
+                
+                // Update preview texts
+                const excelPreviewTitle = document.getElementById('excelPreviewTitle');
+                if (excelPreviewTitle) excelPreviewTitle.textContent = t.excelPreviewTitle;
+                
+                const excelPreviewEmpty = document.getElementById('excelPreviewEmpty');
+                if (excelPreviewEmpty) excelPreviewEmpty.textContent = t.excelPreviewEmpty;
             }
             
             // Update field selection section if visible
@@ -2130,6 +2205,84 @@
                 showStatus(translations[currentLanguage].excelFileDownloaded, 'success');
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // Excel Preview Fonksiyonları
+        function updateExcelPreview() {
+            const previewContainer = document.getElementById('excelPreviewContainer');
+            const previewSection = document.getElementById('excelPreviewSection');
+            
+            if (!previewContainer || !previewSection) return;
+            
+            const selectedFields = getSelectedFields();
+            
+            if (selectedFields.length === 0) {
+                previewContainer.innerHTML = `<p style="color: #6c757d; text-align: center; padding: 20px;" id="excelPreviewEmpty">${translations[currentLanguage].excelPreviewEmpty}</p>`;
+                previewSection.classList.add('hidden');
+                return;
+            }
+            
+            // Preview'ı göster
+            previewSection.classList.remove('hidden');
+            
+            // Excel tablosu oluştur
+            let tableHTML = '<table class="excel-preview-table">';
+            
+            // Header row
+            tableHTML += '<thead><tr>';
+            selectedFields.forEach(field => {
+                tableHTML += `<th>${field}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            // Data rows (ilk 10 kayıt)
+            tableHTML += '<tbody>';
+            const maxRows = Math.min(10, currentData.length);
+            for (let i = 0; i < maxRows; i++) {
+                const record = currentData[i];
+                tableHTML += '<tr>';
+                selectedFields.forEach(field => {
+                    const value = getNestedValue(record, field);
+                    const displayValue = formatPreviewValue(value);
+                    tableHTML += `<td>${displayValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</tbody>';
+            
+            // Eğer daha fazla kayıt varsa bilgi ekle
+            if (currentData.length > maxRows) {
+                tableHTML += `<tfoot><tr><td colspan="${selectedFields.length}" style="text-align: center; font-style: italic; color: #6c757d; padding: 10px;">... and ${currentData.length - maxRows} more rows</td></tr></tfoot>`;
+            }
+            
+            tableHTML += '</table>';
+            previewContainer.innerHTML = tableHTML;
+        }
+        
+        function getNestedValue(obj, path) {
+            return path.split('.').reduce((current, key) => {
+                return current && current[key] !== undefined ? current[key] : null;
+            }, obj);
+        }
+        
+        function formatPreviewValue(value) {
+            if (value === null || value === undefined) {
+                return '<span style="color: #6c757d; font-style: italic;">null</span>';
+            }
+            
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    return `<span style="color: #007bff;">Array (${value.length} items)</span>`;
+                } else {
+                    return `<span style="color: #28a745;">Object</span>`;
+                }
+            }
+            
+            if (typeof value === 'string' && value.length > 50) {
+                return value.substring(0, 50) + '...';
+            }
+            
+            return String(value);
         }
 
         // Seçim Geçmişi Fonksiyonları
@@ -2320,6 +2473,7 @@
             });
             
             updateSelectedCount();
+            updateExcelPreview();
         }
 
         function selectSingleField(fieldName) {
@@ -2330,6 +2484,7 @@
                 const mainCheckbox = document.querySelector(`input[value="${fieldName}"]`);
                 if (mainCheckbox) mainCheckbox.checked = true;
                 updateSelectedCount();
+            updateExcelPreview();
                 showStatus(`"${fieldName}" alanı seçildi`, 'success');
             } else {
                 showStatus(`"${fieldName}" alanı bulunamadı`, 'error');
