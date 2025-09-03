@@ -1,10 +1,20 @@
-name: Deploy to Vercel
+name: Deploy to Multiple Environments
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - preview
 
 jobs:
   test:
@@ -37,19 +47,76 @@ jobs:
         curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 | grep -q "200" || exit 1
         pkill -f "node index.js"
 
-  deploy:
+  deploy-production:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.event_name == 'push' || github.event.inputs.environment == 'production')
+    environment: production
+    name: Deploy to Production
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Deploy to Vercel
+    - name: Deploy to Vercel (Production)
       run: |
         npm install -g vercel@latest
         vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
       env:
-        VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        
+    - name: Deploy to Railway (Production)
+      run: |
+        npm install -g @railway/cli
+        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  deploy-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.event_name == 'push' || github.event.inputs.environment == 'preview')
+    environment: preview
+    name: Deploy to Preview
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Railway (Preview)
+      run: |
+        npm install -g @railway/cli
+        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway environment preview
+        railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  manual-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment: ${{ github.event.inputs.environment }}
+    name: Manual Deploy to ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Railway (${{ github.event.inputs.environment }})
+      run: |
+        npm install -g @railway/cli
+        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
+          railway environment preview
+          railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+        else
+          railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
+        fi
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

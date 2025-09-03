@@ -28,6 +28,48 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 
 **[🌐 Online Versiyonu Deneyin](https://json-to-excel-converter.vercel.app)**
 
+## 🔄 Dual Environment Deployment
+
+Bu proje hem **Production** hem de **Preview** environment'larına deploy edilebilir.
+
+### 🏭 Production Environment
+- **Vercel**: Otomatik deploy (main branch push)
+- **Railway**: Production PostgreSQL ile
+- **URL**: Ana production URL
+
+### 🧪 Preview Environment  
+- **Railway**: Preview PostgreSQL ile
+- **Test**: Yeni özellikler için güvenli test alanı
+- **URL**: Preview URL
+
+### 🚀 Manuel Deploy
+GitHub Actions'da manuel deploy tetikleyebilirsin:
+1. **Actions** sekmesine git
+2. **"Deploy to Multiple Environments"** workflow'unu seç
+3. **"Run workflow"** butonuna tıkla
+4. **Environment** seç: `production` veya `preview`
+
+### 🔐 GitHub Secrets Kurulumu
+
+Dual environment deploy için şu secrets'ları ekle:
+
+#### Vercel (Production)
+- `VERCEL_TOKEN`: Vercel API token
+- `VERCEL_ORG_ID`: Vercel organization ID  
+- `VERCEL_PROJECT_ID`: Vercel project ID
+
+#### Railway (Production + Preview)
+- `RAILWAY_TOKEN`: Railway API token
+- `RAILWAY_PROJECT_ID`: Railway project ID
+- `RAILWAY_SERVICE_ID`: Production service ID
+- `RAILWAY_PREVIEW_SERVICE_ID`: Preview service ID
+
+#### Railway Service ID'lerini Bul
+1. **Railway Dashboard**'da projene git
+2. **Production environment**'da service'e tıkla
+3. **Settings** → **General** → **Service ID** kopyala
+4. **Preview environment** için aynısını yap
+
 ## 📦 Kurulum
 
 ### Gereksinimler
