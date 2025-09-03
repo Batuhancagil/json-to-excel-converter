@@ -966,7 +966,7 @@
                 <div id="excelFilenameSection" class="excel-filename-section hidden">
                     <label for="excelFilename" class="filename-label" id="filenameLabel">📁 Excel Dosya Adı (Opsiyonel):</label>
                     <div class="filename-input-group">
-                        <input type="text" id="excelFilename" placeholder="ornek_veri" class="filename-input">
+                        <input type="text" id="excelFilename" placeholder="" class="filename-input">
                         <span class="filename-extension">.xlsx</span>
                     </div>
                     <small class="filename-help" id="filenameHelp">Boş bırakırsanız otomatik isim kullanılır</small>
@@ -1893,6 +1893,7 @@
                 templateSaved: "template'i kaydedildi",
                 templateNotFound: "Template bulunamadı",
                 templateNamePlaceholder: "Template adını girin",
+                excelFilenamePlaceholder: "ornek_veri",
                 sampleDataLoaded: "Örnek veri yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
@@ -1951,6 +1952,7 @@
                 templateSaved: "template saved",
                 templateNotFound: "Template not found",
                 templateNamePlaceholder: "Enter template name",
+                excelFilenamePlaceholder: "sample_data",
                 sampleDataLoaded: "Sample data loaded. Now click \"Upload Data\" button.",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
@@ -2008,6 +2010,7 @@
             if (templateSelect && templateSelect.options.length > 0) {
                 templateSelect.options[0].text = t.noTemplateOption;
                 document.getElementById('templateName').placeholder = t.templateNamePlaceholder;
+                document.getElementById('excelFilename').placeholder = t.excelFilenamePlaceholder;
             }
             
             // Update field selection section if visible

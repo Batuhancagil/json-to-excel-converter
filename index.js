@@ -120,7 +120,7 @@ app.post('/upload', upload.single('jsonFile'), (req, res) => {
             
             res.json({
                 success: true,
-                message: 'JSON verisi başarıyla yüklendi',
+                message: 'JSON data uploaded successfully',
                 fieldCount: availableFields.length,
                 recordCount: dataArray.length,
                 fields: availableFields,
@@ -129,11 +129,11 @@ app.post('/upload', upload.single('jsonFile'), (req, res) => {
             });
         }).catch(error => {
             console.error('Veritabanı veri getirme hatası:', error);
-            res.json({
-                success: true,
-                message: 'JSON verisi başarıyla yüklendi',
-                fieldCount: availableFields.length,
-                recordCount: dataArray.length,
+        res.json({
+            success: true,
+                message: 'JSON data uploaded successfully',
+            fieldCount: availableFields.length,
+            recordCount: dataArray.length,
                 fields: availableFields,
                 selectionHistory: selectionHistory,
                 templates: templates
@@ -142,7 +142,7 @@ app.post('/upload', upload.single('jsonFile'), (req, res) => {
 
     } catch (error) {
         console.error('JSON parsing error:', error);
-        res.status(400).json({ error: 'JSON verisi işlenirken hata oluştu: ' + error.message });
+        res.status(400).json({ error: 'Error processing JSON data: ' + error.message });
     }
 });
 
@@ -346,7 +346,7 @@ app.post('/convert', (req, res) => {
 
     } catch (error) {
         console.error('Conversion error:', error);
-        res.status(500).json({ error: 'Excel dönüştürme hatası: ' + error.message });
+        res.status(500).json({ error: 'Excel conversion error: ' + error.message });
     }
 });
 
@@ -393,12 +393,12 @@ app.post('/apply-selection', async (req, res) => {
             success: true,
             appliedFields: availableFieldsInSelection,
             unavailableFields: unavailableFields,
-            message: `${availableFieldsInSelection.length} alan uygulandı${unavailableFields.length > 0 ? `, ${unavailableFields.length} alan mevcut değil` : ''}`
+            message: `${availableFieldsInSelection.length} fields applied${unavailableFields.length > 0 ? `, ${unavailableFields.length} fields not available` : ''}`
         });
         
     } catch (error) {
         console.error('Apply selection error:', error);
-        res.status(500).json({ error: 'Seçim uygulanırken hata oluştu: ' + error.message });
+        res.status(500).json({ error: 'Error applying selection: ' + error.message });
     }
 });
 
@@ -474,12 +474,12 @@ app.post('/smart-match', async (req, res) => {
             success: true,
             matchedFields: matchedFields,
             suggestions: suggestions,
-            message: `${matchedFields.length} alan eşleşti, ${suggestions.length} öneri var`
+            message: `${matchedFields.length} fields matched, ${suggestions.length} suggestions available`
         });
         
     } catch (error) {
         console.error('Smart match error:', error);
-        res.status(500).json({ error: 'Akıllı eşleştirme hatası: ' + error.message });
+        res.status(500).json({ error: 'Smart matching error: ' + error.message });
     }
 });
 
@@ -511,7 +511,7 @@ app.post('/save-template', (req, res) => {
             .then(savedTemplate => {
                 res.json({
                     success: true,
-                    message: 'Template başarıyla kaydedildi',
+                    message: 'Template saved successfully',
                     template: savedTemplate
                 });
             })
@@ -521,7 +521,7 @@ app.post('/save-template', (req, res) => {
         
     } catch (error) {
         console.error('Save template error:', error);
-        res.status(500).json({ error: 'Template kaydedilirken hata oluştu: ' + error.message });
+        res.status(500).json({ error: 'Error saving template: ' + error.message });
     }
 });
 
@@ -535,7 +535,7 @@ app.post('/apply-template', async (req, res) => {
         
         const template = await db.getTemplateById(parseInt(templateId));
         if (!template) {
-            return res.status(404).json({ error: 'Template bulunamadı' });
+            return res.status(404).json({ error: 'Template not found' });
         }
         
         // Check which fields are available in current data
@@ -556,12 +556,12 @@ app.post('/apply-template', async (req, res) => {
             appliedFields: availableFieldsInTemplate,
             unavailableFields: unavailableFields,
             templateName: template.name,
-            message: `"${template.name}" template'i uygulandı: ${availableFieldsInTemplate.length} alan uygulandı${unavailableFields.length > 0 ? `, ${unavailableFields.length} alan mevcut değil` : ''}`
+            message: `"${template.name}" template applied: ${availableFieldsInTemplate.length} fields applied${unavailableFields.length > 0 ? `, ${unavailableFields.length} fields not available` : ''}`
         });
-        
+
     } catch (error) {
         console.error('Apply template error:', error);
-        res.status(500).json({ error: 'Template uygulanırken hata oluştu: ' + error.message });
+        res.status(500).json({ error: 'Error applying template: ' + error.message });
     }
 });
 
@@ -571,18 +571,18 @@ app.delete('/delete-template/:id', async (req, res) => {
         
         const deletedTemplate = await db.deleteTemplate(templateId);
         if (!deletedTemplate) {
-            return res.status(404).json({ error: 'Template bulunamadı' });
+            return res.status(404).json({ error: 'Template not found' });
         }
         
         res.json({
             success: true,
-            message: `"${deletedTemplate.name}" template'i silindi`,
+            message: `"${deletedTemplate.name}" template deleted`,
             deletedTemplate: deletedTemplate
         });
-        
+
     } catch (error) {
         console.error('Delete template error:', error);
-        res.status(500).json({ error: 'Template silinirken hata oluştu: ' + error.message });
+        res.status(500).json({ error: 'Error deleting template: ' + error.message });
     }
 });
 
