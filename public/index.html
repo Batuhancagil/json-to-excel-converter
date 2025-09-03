@@ -879,30 +879,30 @@
                     <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </div>
-            <p>JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin</p>
+            <p>Convert your JSON data to Excel format and select the fields you want</p>
         </div>
 
         <div class="content">
             <!-- JSON Upload Section -->
             <div class="section">
-                <h2>📁 JSON Verisi Yükle</h2>
+                <h2>📁 Upload JSON Data</h2>
                 
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📄</div>
-                    <p><strong>JSON veya TXT dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
-                    <p style="color: #6c757d; margin-top: 10px;">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
+                    <p><strong>Drag and drop JSON or TXT file here</strong> or click to select</p>
+                    <p style="color: #6c757d; margin-top: 10px;">Or paste JSON data directly below</p>
                     <input type="file" id="fileInput" class="file-input" accept=".json,.txt">
                 </div>
 
                 <div style="margin-top: 20px;">
-                    <p><strong>Veya JSON verisi yapıştırın:</strong></p>
-                    <textarea id="jsonInput" class="json-input" placeholder='Örnek: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
+                    <p><strong>Or paste JSON data:</strong></p>
+                    <textarea id="jsonInput" class="json-input" placeholder='Example: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
                 </div>
 
                 <div class="actions">
-                    <button class="btn" onclick="uploadJSON()">📤 Veri Yükle</button>
-                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
-                    <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
+                    <button class="btn" onclick="uploadJSON()">📤 Upload Data</button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Sample Data</button>
+                    <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 Download JSON as TXT</button>
                 </div>
             </div>
 
@@ -916,23 +916,23 @@
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number" id="recordCount">0</div>
-                        <div class="stat-label">Kayıt Sayısı</div>
+                        <div class="stat-label">Record Count</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="fieldCount">0</div>
-                        <div class="stat-label">Toplam Alan</div>
+                        <div class="stat-label">Total Fields</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="selectedCount">0</div>
-                        <div class="stat-label">Seçilen Alan</div>
+                        <div class="stat-label">Selected Fields</div>
                     </div>
                 </div>
             </div>
 
             <!-- Field Selection Section -->
             <div id="fieldSelectionSection" class="section hidden">
-                <h2>✅ Excel'e Dahil Edilecek Alanları Seçin</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.</p>
+                <h2>✅ Select Fields to Include in Excel</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">Review the first record's data and mark the fields you want. Selected fields will be included in the Excel file.</p>
                 
                 <!-- İlk Kayıt Önizleme -->
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">

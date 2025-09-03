@@ -62,7 +62,7 @@ jobs:
         echo ${{ secrets.RAILWAY_TOKEN }} | railway login
         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
         railway environment production
-        railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -83,7 +83,7 @@ jobs:
         echo ${{ secrets.RAILWAY_TOKEN }} | railway login
         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
         railway environment preview
-        railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         NODE_ENV: preview
@@ -105,7 +105,7 @@ jobs:
         echo ${{ secrets.RAILWAY_TOKEN }} | railway login
         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
         railway environment preview
-        railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         NODE_ENV: preview
@@ -128,11 +128,11 @@ jobs:
         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
         if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
           railway environment preview
-          railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+          railway up
           echo "NODE_ENV=preview" >> $GITHUB_ENV
         else
           railway environment production
-          railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
+          railway up
         fi
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
