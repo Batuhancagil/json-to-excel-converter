@@ -237,6 +237,15 @@
             opacity: 0.7;
         }
 
+        /* EN başlangıç durumu için */
+        input:not(:checked) + .slider .slider-text.tr {
+            opacity: 0.7;
+        }
+
+        input:not(:checked) + .slider .slider-text.en {
+            opacity: 1;
+        }
+
         .btn-sm {
             padding: 6px 15px;
             font-size: 0.8em;
@@ -821,7 +830,7 @@
                 </div>
                 <div class="language-switch" style="position: absolute; right: 0;">
                     <label class="switch">
-                        <input type="checkbox" id="languageToggle" onchange="toggleLanguage()">
+                        <input type="checkbox" id="languageToggle" onchange="toggleLanguage()" checked>
                         <span class="slider">
                             <span class="slider-text tr">TR</span>
                             <span class="slider-text en">EN</span>
@@ -849,7 +858,7 @@
                     <textarea id="jsonInput" class="json-input" placeholder='Örnek: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
                 </div>
 
-                <div class="actions">
+                <div class="actions" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
                     <button class="btn" onclick="uploadJSON()" id="uploadBtn">📤 Veri Yükle</button>
                     <button class="btn btn-secondary" onclick="loadSampleData()" id="sampleBtn">📋 Örnek Veri</button>
                     <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
@@ -1939,6 +1948,14 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Dil switch'i EN ile başlat
+            const toggle = document.getElementById('languageToggle');
+            if (toggle) {
+                toggle.checked = true; // EN aktif
+            }
+            
+            // Dil güncelle
+            updateLanguage();
             showStatus(translations[currentLanguage].useUploadAreas, 'info');
         });
         
