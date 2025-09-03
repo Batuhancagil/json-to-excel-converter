@@ -26,79 +26,7 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 
 ## 🚀 Canlı Demo
 
-**[🌐 Production Versiyonu](https://json-to-excel-converter-production.up.railway.app)**  
-**[🧪 Preview Versiyonu](https://json-to-excel-converter-preview.up.railway.app)**
-
-## 🚀 Manual Deployment System
-
-Bu proje **hibrit deployment** sistemi kullanır:
-
-### 🚀 Otomatik Production Deploy
-- **Main branch**'e push → **Otomatik production deploy**
-- **Gerçek proje** için main branch kullanın
-
-### 🧪 Manuel Preview Deploy  
-- **Preview branch**'te geliştirme yapın
-- **Test** için manuel preview deploy
-- **Onay** sonrası main'e eşitleyin
-
-### 🌿 Main Branch → Production
-- **Railway**: Production environment + PostgreSQL
-- **URL**: https://json-to-excel-converter-production.up.railway.app
-- **Güvenlik**: Sadece test edilmiş, onaylanmış kodlar
-
-### 🧪 Preview Branch → Preview
-- **Railway**: Preview environment + Fallback mode
-- **Test**: Yeni özellikler için güvenli test alanı
-- **URL**: https://json-to-excel-converter-preview.up.railway.app
-- **Geliştirme**: Deneysel özellikler, test edilecek kodlar
-
-### 🔄 Pull Request Workflow
-1. **Preview branch**'te geliştir
-2. **Pull Request** oluştur (preview → main)
-3. **Otomatik test** + preview deploy
-4. **Code review** + onay
-5. **Merge** → Production'a otomatik deploy
-
-### 🔄 Geliştirme Workflow'u
-
-#### **1. Geliştirme (Preview Branch)**
-```bash
-git checkout preview
-# Kod geliştir
-git add .
-git commit -m "Yeni özellik"
-git push origin preview
-```
-
-#### **2. Test (Manuel Preview Deploy)**
-- GitHub Actions → Manual Railway Deployment
-- Environment: `preview`, Branch: `preview`
-- Test et, onayla
-
-#### **3. Production'a Eşitleme**
-```bash
-git checkout main
-git merge preview
-git push origin main
-# Otomatik production deploy başlar
-```
-
-### 🚀 Manuel Deploy (İsteğe Bağlı)
-- GitHub Actions → Manual Railway Deployment
-- Environment ve branch seç
-- Deploy et
-
-### 🔐 GitHub Secrets Kurulumu
-
-Dual environment deploy için şu secrets'ları ekle:
-
-#### Railway (Production + Preview)
-- `RAILWAY_TOKEN`: Railway API token
-- `RAILWAY_PROJECT_ID`: Railway project ID
-
-
-
+**[🌐 Online Versiyonu Deneyin](https://json-to-excel-converter.vercel.app)**
 
 ## 📦 Kurulum
 
@@ -183,7 +111,15 @@ DELETE /delete-template/:id # Template sil
 
 ## 🚀 Deployment
 
+### Vercel (Önerilen)
+```bash
+# Vercel CLI ile
+npm i -g vercel
+vercel
 
+# GitHub ile otomatik
+# Repository'yi Vercel'e bağla
+```
 
 ### Heroku
 ```bash

@@ -151,149 +151,6 @@
             box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
         }
         
-        /* Excel Preview Stilleri */
-        .excel-preview-container {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .excel-preview-header {
-            background: linear-gradient(135deg, #0066cc, #0099ff);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .excel-preview-tabs {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .excel-tab {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-        
-        .excel-tab:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
-        }
-        
-        .excel-tab.active {
-            background: white;
-            color: #0066cc;
-            font-weight: 600;
-        }
-        
-        .excel-preview-info {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        
-        .excel-preview-content {
-            display: none;
-            padding: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .excel-preview-content.active {
-            display: block;
-        }
-        
-        /* Tablo Görünümü */
-        .excel-preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-        
-        .excel-preview-table th {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            color: #495057;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .excel-preview-table td {
-            border: 1px solid #dee2e6;
-            padding: 8px;
-            color: #212529;
-        }
-        
-        .excel-preview-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        .excel-preview-table tr:hover {
-            background: #e9ecef;
-        }
-        
-        /* Grid Görünümü */
-        .excel-preview-grid {
-            display: grid;
-            gap: 1px;
-            background: #dee2e6;
-            border: 1px solid #dee2e6;
-        }
-        
-        .excel-grid-cell {
-            background: white;
-            padding: 8px;
-            font-size: 0.9em;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .excel-grid-header {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .excel-grid-row:nth-child(even) .excel-grid-cell {
-            background: #f8f9fa;
-        }
-        
-        .excel-grid-row:hover .excel-grid-cell {
-            background: #e9ecef;
-        }
-        
-        /* Actions butonları için özel stiller */
-        .actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-        
-        .actions .btn {
-            min-width: 140px;
-            transition: all 0.3s ease;
-        }
-        
-        .actions .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
         .btn-warning {
             background: linear-gradient(135deg, #ffc107, #e0a800);
         }
@@ -870,48 +727,39 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
             <h1>🔄 JSON to Excel Converter</h1>
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
-                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
-                        <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
-                        <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label for="languageSelect" style="color: white; font-weight: 500;">🌍 Language:</label>
-                    <select id="languageSelect" onchange="changeLanguage()" style="padding: 8px 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2); color: white; font-weight: 500;">
-                        <option value="en">English</option>
-                        <option value="tr">Türkçe</option>
-                    </select>
-                </div>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                    <path d="M9 9h6v6H9z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
+                    <path d="M9 12h6M9 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M15 3v6M21 9h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
             </div>
-            <p id="headerDescription">Convert your JSON data to Excel format and select the fields you want</p>
+            <p>JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin</p>
         </div>
 
         <div class="content">
             <!-- JSON Upload Section -->
             <div class="section">
-                <h2>📁 Upload JSON Data</h2>
+                <h2>📁 JSON Verisi Yükle</h2>
                 
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📄</div>
-                    <p><strong>Drag and drop JSON or TXT file here</strong> or click to select</p>
-                    <p style="color: #6c757d; margin-top: 10px;">Or paste JSON data directly below</p>
+                    <p><strong>JSON veya TXT dosyasını buraya sürükleyin</strong> veya tıklayarak seçin</p>
+                    <p style="color: #6c757d; margin-top: 10px;">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
                     <input type="file" id="fileInput" class="file-input" accept=".json,.txt">
                 </div>
 
                 <div style="margin-top: 20px;">
-                    <p><strong>Or paste JSON data:</strong></p>
-                    <textarea id="jsonInput" class="json-input" placeholder='Example: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
+                    <p><strong>Veya JSON verisi yapıştırın:</strong></p>
+                    <textarea id="jsonInput" class="json-input" placeholder='Örnek: [{"id": 1, "name": "John", "age": 30}, {"id": 2, "name": "Jane", "age": 25}]'></textarea>
                 </div>
 
                 <div class="actions">
-                    <button class="btn" onclick="uploadJSON()">📤 Upload Data</button>
-                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Sample Data</button>
-                    <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 Download JSON as TXT</button>
+                    <button class="btn" onclick="uploadJSON()">📤 Veri Yükle</button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">📋 Örnek Veri</button>
+                    <button class="btn btn-info" onclick="downloadJSONAsTxt()" id="downloadBtn" style="display: none;">📥 JSON'ı TXT Olarak İndir</button>
                 </div>
             </div>
 
@@ -925,28 +773,28 @@
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number" id="recordCount">0</div>
-                        <div class="stat-label">Record Count</div>
+                        <div class="stat-label">Kayıt Sayısı</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="fieldCount">0</div>
-                        <div class="stat-label">Total Fields</div>
+                        <div class="stat-label">Toplam Alan</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="selectedCount">0</div>
-                        <div class="stat-label">Selected Fields</div>
+                        <div class="stat-label">Seçilen Alan</div>
                     </div>
                 </div>
             </div>
 
             <!-- Field Selection Section -->
             <div id="fieldSelectionSection" class="section hidden">
-                <h2>✅ Select Fields to Include in Excel</h2>
-                <p style="margin-bottom: 20px; color: #6c757d;">Review the first record's data and mark the fields you want. Selected fields will be included in the Excel file.</p>
+                <h2>✅ Excel'e Dahil Edilecek Alanları Seçin</h2>
+                <p style="margin-bottom: 20px; color: #6c757d;">İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.</p>
                 
                 <!-- İlk Kayıt Önizleme -->
                 <div id="firstRecordPreview" class="section" style="background: #f8fbff; border: 2px solid #4facfe;">
-                    <h3 id="firstRecordTitle">👁️ First Record Preview</h3>
-                    <p id="firstRecordDescription" style="color: #6c757d; margin-bottom: 15px;">Select which fields from this record you want to add to Excel:</p>
+                    <h3>👁️ İlk Kayıt Önizlemesi</h3>
+                    <p style="color: #6c757d; margin-bottom: 15px;">Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:</p>
                     <div class="preview-wrapper">
                         <div id="previewContainer" style="max-height: 700px; overflow-y: auto; background: white; border-radius: 10px 10px 0 0; padding: 20px; margin-bottom: 0;"></div>
                         <!-- Sabit Butonlar -->
@@ -1012,39 +860,6 @@
                 <!-- Eski alan seçimi gizlendi -->
                 <div id="fieldsContainer" class="fields-container" style="display: none;"></div>
 
-                <!-- Excel Preview Kutusu -->
-                <div id="excelPreviewSection" class="section hidden" style="background: #f0f8ff; border: 2px solid #0066cc; margin-top: 20px;">
-                    <h3>📊 Excel Preview</h3>
-                    <p style="color: #0066cc; margin-bottom: 15px;">Seçilen alanlara göre Excel'de nasıl görüneceğini önizleyin:</p>
-                    
-                    <div class="excel-preview-container">
-                        <div class="excel-preview-header">
-                            <div class="excel-preview-tabs">
-                                <button class="excel-tab active" onclick="switchExcelTab('table')">📋 Tablo Görünümü</button>
-                                <button class="excel-tab" onclick="switchExcelTab('grid')">🔲 Grid Görünümü</button>
-                            </div>
-                            <div class="excel-preview-info">
-                                <span id="excelPreviewStats">0 alan, 0 kayıt</span>
-                            </div>
-                        </div>
-                        
-                        <div id="excelTablePreview" class="excel-preview-content active">
-                            <div class="excel-table-wrapper">
-                                <table id="excelPreviewTable" class="excel-preview-table">
-                                    <thead id="excelPreviewHeader"></thead>
-                                    <tbody id="excelPreviewBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div id="excelGridPreview" class="excel-preview-content">
-                            <div class="excel-grid-wrapper">
-                                <div id="excelPreviewGrid" class="excel-preview-grid"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Excel Dosya Adı Girişi -->
                 <div id="excelFilenameSection" class="excel-filename-section hidden">
                     <label for="excelFilename" class="filename-label">📁 Excel Dosya Adı (Opsiyonel):</label>
@@ -1056,11 +871,11 @@
                 </div>
 
                 <div class="actions">
-                    <button class="btn btn-sm" onclick="convertToExcel()" id="convertBtn">
+                    <button class="btn" onclick="convertToExcel()" id="convertBtn">
                         <span class="loading hidden" id="convertLoading"></span>
                         📊 Excel'e Dönüştür
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
+                    <button class="btn btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
                 </div>
             </div>
         </div>
@@ -1256,7 +1071,7 @@
                     console.log('selectionHistory:', selectionHistory);
                     console.log('templates:', templates);
                     
-                    showStatus(translations[currentLanguage].dataUploadedSuccessfully, 'success');
+                    showStatus(data.message, 'success');
                     showStats(jsonData);
                     showFieldSelection();
                     updateHistoryDropdown();
@@ -1726,9 +1541,6 @@
             fieldsCheckboxes.forEach(checkbox => {
                 checkbox.closest('.field-checkbox').classList.add('selected');
             });
-            
-            // Excel preview'ı güncelle
-            updateExcelPreview();
         }
         
         function getSelectedFields() {
@@ -1907,110 +1719,9 @@
             }
         }
 
-        // Language translations
-        const translations = {
-            en: {
-                headerDescription: "Convert your JSON data to Excel format and select the fields you want",
-                uploadTitle: "📁 Upload JSON Data",
-                uploadDescription: "Drag and drop JSON or TXT file here or click to select",
-                uploadDescription2: "Or paste JSON data directly below",
-                pasteJson: "Or paste JSON data:",
-                uploadData: "📤 Upload Data",
-                sampleData: "📋 Sample Data",
-                downloadJson: "📥 Download JSON as TXT",
-                recordCount: "Record Count",
-                totalFields: "Total Fields",
-                selectedFields: "Selected Fields",
-                selectFieldsTitle: "✅ Select Fields to Include in Excel",
-                selectFieldsDescription: "Review the first record's data and mark the fields you want. Selected fields will be included in the Excel file.",
-                firstRecordTitle: "👁️ First Record Preview",
-                firstRecordDescription: "Select which fields from this record you want to add to Excel:",
-                selectAll: "🔘 Select All",
-                deselectAll: "❌ Deselect All",
-                copy: "📋 Copy",
-                debug: "🐛 Debug",
-                saveTemplate: "💾 Save Template",
-                convertToExcel: "📊 Convert to Excel",
-                clearData: "🗑️ Clear Data",
-                useUploadAreas: "Use the areas above to upload JSON data",
-                dataUploadedSuccessfully: "JSON data uploaded successfully"
-            },
-            tr: {
-                headerDescription: "JSON verilerinizi Excel formatına dönüştürün ve istediğiniz alanları seçin",
-                uploadTitle: "📁 JSON Verisi Yükle",
-                uploadDescription: "JSON veya TXT dosyasını buraya sürükleyin veya tıklayarak seçin",
-                uploadDescription2: "Veya aşağıya doğrudan JSON verisi yapıştırın",
-                pasteJson: "Veya JSON verisi yapıştırın:",
-                uploadData: "📤 Veri Yükle",
-                sampleData: "📋 Örnek Veri",
-                downloadJson: "📥 JSON'ı TXT Olarak İndir",
-                recordCount: "Kayıt Sayısı",
-                totalFields: "Toplam Alan",
-                selectedFields: "Seçilen Alan",
-                selectFieldsTitle: "✅ Excel'e Dahil Edilecek Alanları Seçin",
-                selectFieldsDescription: "İlk kayıtın verilerini inceleyin ve istediğiniz alanları işaretleyin. Seçilen alanlar Excel dosyasına dahil edilecektir.",
-                firstRecordTitle: "👁️ İlk Kayıt Önizlemesi",
-                firstRecordDescription: "Bu kayıttan hangi alanları Excel'e eklemek istediğinizi seçin:",
-                selectAll: "🔘 Tümünü Seç",
-                deselectAll: "❌ Tümünü Kaldır",
-                copy: "📋 Kopyala",
-                debug: "🐛 Debug",
-                saveTemplate: "💾 Template Kaydet",
-                convertToExcel: "📊 Excel'e Dönüştür",
-                clearData: "🗑️ Verileri Temizle",
-                useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın",
-                dataUploadedSuccessfully: "JSON verisi başarıyla yüklendi"
-            }
-        };
-
-        let currentLanguage = 'en';
-
-        function changeLanguage() {
-            const select = document.getElementById('languageSelect');
-            currentLanguage = select.value;
-            
-            // Update all text elements
-            document.getElementById('headerDescription').textContent = translations[currentLanguage].headerDescription;
-            document.querySelector('.section h2').textContent = translations[currentLanguage].uploadTitle;
-            document.querySelector('.upload-area p strong').textContent = translations[currentLanguage].uploadDescription;
-            document.querySelector('.upload-area p[style*="color: #6c757d"]').textContent = translations[currentLanguage].uploadDescription2;
-            document.querySelector('p strong').textContent = translations[currentLanguage].pasteJson;
-            document.querySelector('button[onclick="uploadJSON()"]').textContent = translations[currentLanguage].uploadData;
-            document.querySelector('button[onclick="loadSampleData()"]').textContent = translations[currentLanguage].sampleData;
-            document.querySelector('button[onclick="downloadJSONAsTxt()"]').textContent = translations[currentLanguage].downloadJson;
-            document.querySelector('.stat-label').textContent = translations[currentLanguage].recordCount;
-            document.querySelectorAll('.stat-label')[1].textContent = translations[currentLanguage].totalFields;
-            document.querySelectorAll('.stat-label')[2].textContent = translations[currentLanguage].selectedFields;
-            
-            // Update field selection section
-            const fieldSection = document.getElementById('fieldSelectionSection');
-            if (fieldSection && !fieldSection.classList.contains('hidden')) {
-                fieldSection.querySelector('h2').textContent = translations[currentLanguage].selectFieldsTitle;
-                fieldSection.querySelector('p').textContent = translations[currentLanguage].selectFieldsDescription;
-                document.getElementById('firstRecordTitle').textContent = translations[currentLanguage].firstRecordTitle;
-                document.getElementById('firstRecordDescription').textContent = translations[currentLanguage].firstRecordDescription;
-            }
-            
-            // Update buttons
-            const buttons = document.querySelectorAll('.action-buttons .btn');
-            if (buttons.length >= 5) {
-                buttons[0].textContent = translations[currentLanguage].selectAll;
-                buttons[1].textContent = translations[currentLanguage].deselectAll;
-                buttons[2].textContent = translations[currentLanguage].copy;
-                buttons[3].textContent = translations[currentLanguage].debug;
-                buttons[4].textContent = translations[currentLanguage].saveTemplate;
-            }
-            
-            const convertButtons = document.querySelectorAll('.actions .btn');
-            if (convertButtons.length >= 2) {
-                convertButtons[0].textContent = translations[currentLanguage].convertToExcel;
-                convertButtons[1].textContent = translations[currentLanguage].clearData;
-            }
-        }
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            showStatus(translations[currentLanguage].useUploadAreas, 'info');
+            showStatus('JSON verisi yüklemek için yukarıdaki alanları kullanın', 'info');
         });
         
         // Debug fonksiyonları
@@ -2295,132 +2006,6 @@
             });
         }
 
-        // Excel Preview Fonksiyonları
-        function updateExcelPreview() {
-            if (!uploadedData || !availableFields) return;
-            
-            const selectedFields = getSelectedFields();
-            if (selectedFields.length === 0) {
-                hideExcelPreview();
-                return;
-            }
-            
-            showExcelPreview();
-            updateExcelPreviewStats(selectedFields.length);
-            renderExcelPreview(selectedFields);
-        }
-        
-        function showExcelPreview() {
-            document.getElementById('excelPreviewSection').classList.remove('hidden');
-        }
-        
-        function hideExcelPreview() {
-            document.getElementById('excelPreviewSection').classList.add('hidden');
-        }
-        
-        function updateExcelPreviewStats(fieldCount) {
-            const recordCount = Array.isArray(uploadedData) ? uploadedData.length : 
-                               (uploadedData.data ? uploadedData.data.length : 0);
-            document.getElementById('excelPreviewStats').textContent = 
-                `${fieldCount} alan, ${recordCount} kayıt`;
-        }
-        
-        function renderExcelPreview(selectedFields) {
-            renderExcelTablePreview(selectedFields);
-            renderExcelGridPreview(selectedFields);
-        }
-        
-        function renderExcelTablePreview(selectedFields) {
-            const header = document.getElementById('excelPreviewHeader');
-            const body = document.getElementById('excelPreviewBody');
-            
-            // Header oluştur
-            header.innerHTML = selectedFields.map(field => 
-                `<th>${field}</th>`
-            ).join('');
-            
-            // Body oluştur (ilk 10 kayıt)
-            const data = Array.isArray(uploadedData) ? uploadedData : 
-                         (uploadedData.data ? uploadedData.data : []);
-            const previewData = data.slice(0, 10);
-            
-            body.innerHTML = previewData.map(record => 
-                `<tr>${selectedFields.map(field => 
-                    `<td>${formatCellValue(record[field])}</td>`
-                ).join('')}</tr>`
-            ).join('');
-            
-            if (data.length > 10) {
-                body.innerHTML += `<tr><td colspan="${selectedFields.length}" style="text-align: center; color: #6c757d; font-style: italic;">
-                    ... ve ${data.length - 10} kayıt daha
-                </td></tr>`;
-            }
-        }
-        
-        function renderExcelGridPreview(selectedFields) {
-            const grid = document.getElementById('excelPreviewGrid');
-            grid.innerHTML = ''; // Önceki içeriği temizle
-            
-            // Grid template oluştur
-            grid.style.gridTemplateColumns = `repeat(${selectedFields.length}, 1fr)`;
-            
-            // Header
-            selectedFields.forEach(field => {
-                const headerCell = document.createElement('div');
-                headerCell.className = 'excel-grid-cell excel-grid-header';
-                headerCell.textContent = field;
-                grid.appendChild(headerCell);
-            });
-            
-            // Data (ilk 5 kayıt)
-            const data = Array.isArray(uploadedData) ? uploadedData : 
-                         (uploadedData.data ? uploadedData.data : []);
-            const previewData = data.slice(0, 5);
-            
-            previewData.forEach(record => {
-                selectedFields.forEach(field => {
-                    const cell = document.createElement('div');
-                    cell.className = 'excel-grid-cell';
-                    cell.textContent = formatCellValue(record[field]);
-                    grid.appendChild(cell);
-                });
-            });
-            
-            if (data.length > 5) {
-                const moreCell = document.createElement('div');
-                moreCell.className = 'excel-grid-cell';
-                moreCell.style.gridColumn = `1 / -1`;
-                moreCell.style.textAlign = 'center';
-                moreCell.style.color = '#6c757d';
-                moreCell.style.fontStyle = 'italic';
-                moreCell.textContent = `... ve ${data.length - 5} kayıt daha`;
-                grid.appendChild(moreCell);
-            }
-        }
-        
-        function formatCellValue(value) {
-            if (value === null || value === undefined) return '-';
-            if (typeof value === 'object') return JSON.stringify(value);
-            if (typeof value === 'string' && value.length > 50) {
-                return value.substring(0, 50) + '...';
-            }
-            return String(value);
-        }
-        
-        function switchExcelTab(tabName) {
-            // Tüm tab'ları deaktif et
-            document.querySelectorAll('.excel-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.excel-preview-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Seçilen tab'ı aktif et
-            event.target.classList.add('active');
-            document.getElementById(`excel${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Preview`).classList.add('active');
-        }
-        
         function saveCurrentSelectionAsTemplate() {
             const selectedFields = getSelectedFields();
             
