@@ -68,10 +68,11 @@ jobs:
         ref: ${{ github.event.inputs.branch || github.ref_name }}
       
     - name: Deploy to Railway (${{ github.event.inputs.environment || 'production' }})
-      uses: railwayapp/railway-deploy@v1
+      uses: railwayapp/cli-action@v1
       with:
         token: ${{ github.event.inputs.environment == 'preview' && secrets.RAILWAY_PREVIEW_TOKEN || secrets.RAILWAY_PRODUCTION_TOKEN }}
         project: ${{ secrets.RAILWAY_PROJECT_ID }}
         environment: ${{ github.event.inputs.environment || 'production' }}
+        command: up
       env:
         NODE_ENV: ${{ github.event.inputs.environment || 'production' }}
