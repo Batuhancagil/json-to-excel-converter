@@ -275,6 +275,25 @@
             background: #e9ecef;
         }
         
+        /* Actions butonları için özel stiller */
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .actions .btn {
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+        
+        .actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
         .btn-warning {
             background: linear-gradient(135deg, #ffc107, #e0a800);
         }
@@ -1028,11 +1047,11 @@
                 </div>
 
                 <div class="actions">
-                    <button class="btn" onclick="convertToExcel()" id="convertBtn">
+                    <button class="btn btn-sm" onclick="convertToExcel()" id="convertBtn">
                         <span class="loading hidden" id="convertLoading"></span>
                         📊 Excel'e Dönüştür
                     </button>
-                    <button class="btn btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
+                    <button class="btn btn-sm btn-danger" onclick="clearData()">🗑️ Verileri Temizle</button>
                 </div>
             </div>
         </div>
