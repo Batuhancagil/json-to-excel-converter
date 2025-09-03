@@ -849,7 +849,7 @@
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📄</div>
                     <p><strong id="uploadDescription">JSON veya TXT dosyasını buraya sürükleyin</strong> <span id="uploadDescription2">veya tıklayarak seçin</span></p>
-                    <p style="color: #6c757d; margin-top: 10px;" id="uploadDescription3">Veya aşağıya doğrudan JSON verisi yapıştırın</p>
+                    <p style="color: #6c757d; margin-top: 10px;" id="uploadDescription3">TXT dosyaları otomatik işlenir, JSON dosyaları textarea'ya yüklenir</p>
                     <input type="file" id="fileInput" class="file-input" accept=".json,.txt">
                 </div>
 
@@ -1077,8 +1077,33 @@
             
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                fileInput.files = files;
-                handleFileUpload();
+                const file = files[0];
+                if (file.type === 'application/json' || file.name.endsWith('.txt')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const content = e.target.result;
+                        
+                        // TXT dosyası ise direkt işle, textarea'ya yazma
+                        if (file.name.endsWith('.txt')) {
+                            try {
+                                // JSON formatını kontrol et
+                                const jsonData = JSON.parse(content);
+                                // Direkt backend'e gönder
+                                sendToBackend(content, jsonData);
+                                showStatus(`${file.name} dosyası başarıyla yüklendi ve işlendi!`, 'success');
+                            } catch (error) {
+                                showStatus('TXT dosyası geçerli JSON formatında olmalıdır: ' + error.message, 'error');
+                            }
+                        } else {
+                            // JSON dosyası ise textarea'ya yaz
+                            document.getElementById('jsonInput').value = content;
+                            showStatus(`${file.name} dosyası yüklendi. Şimdi "Veri Yükle" butonuna tıklayın.`, 'info');
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    showStatus('Sadece JSON veya TXT dosyaları kabul edilir', 'error');
+                }
             }
         });
 
@@ -1089,8 +1114,24 @@
             if (file && (file.type === 'application/json' || file.name.endsWith('.txt'))) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('jsonInput').value = e.target.result;
-                    showStatus(`${file.name} dosyası yüklendi. Şimdi "JSON Yükle" butonuna tıklayın.`, 'info');
+                    const content = e.target.result;
+                    
+                    // TXT dosyası ise direkt işle, textarea'ya yazma
+                    if (file.name.endsWith('.txt')) {
+                        try {
+                            // JSON formatını kontrol et
+                            const jsonData = JSON.parse(content);
+                            // Direkt backend'e gönder
+                            sendToBackend(content, jsonData);
+                            showStatus(`${file.name} dosyası başarıyla yüklendi ve işlendi!`, 'success');
+                        } catch (error) {
+                            showStatus('TXT dosyası geçerli JSON formatında olmalıdır: ' + error.message, 'error');
+                        }
+                    } else {
+                        // JSON dosyası ise textarea'ya yaz
+                        document.getElementById('jsonInput').value = content;
+                        showStatus(`${file.name} dosyası yüklendi. Şimdi "Veri Yükle" butonuna tıklayın.`, 'info');
+                    }
                 };
                 reader.readAsText(file);
             } else {
@@ -1831,7 +1872,7 @@
                 uploadTitle: "📁 JSON Verisi Yükle",
                 uploadDescription: "JSON veya TXT dosyasını buraya sürükleyin",
                 uploadDescription2: "veya tıklayarak seçin",
-                uploadDescription3: "Veya aşağıya doğrudan JSON verisi yapıştırın",
+                uploadDescription3: "TXT dosyaları otomatik işlenir, JSON dosyaları textarea'ya yüklenir",
                 pasteJsonLabel: "Veya JSON verisi yapıştırın:",
                 uploadBtn: "📤 Veri Yükle",
                 sampleBtn: "📋 Örnek Veri",
@@ -1863,7 +1904,7 @@
                 uploadTitle: "📁 Upload JSON Data",
                 uploadDescription: "Drag and drop JSON or TXT file here",
                 uploadDescription2: "or click to select",
-                uploadDescription3: "Or paste JSON data directly below",
+                uploadDescription3: "TXT files are processed automatically, JSON files are loaded to textarea",
                 pasteJsonLabel: "Or paste JSON data:",
                 uploadBtn: "📤 Upload Data",
                 sampleBtn: "📋 Sample Data",
