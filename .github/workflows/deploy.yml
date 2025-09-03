@@ -67,19 +67,19 @@ jobs:
       with:
         ref: ${{ github.event.inputs.branch || github.ref_name }}
       
+    - name: Set Railway Token
+      run: |
+        if [ "${{ github.event.inputs.environment || 'production' }}" = "preview" ]; then
+          echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_PREVIEW_TOKEN }}" >> $GITHUB_ENV
+        else
+          echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}" >> $GITHUB_ENV
+        fi
+
     - name: Deploy to Railway (${{ github.event.inputs.environment || 'production' }})
       run: |
         npm install -g @railway/cli
-        if [ "${{ github.event.inputs.environment || 'production' }}" = "preview" ]; then
-          railway login --token ${{ secrets.RAILWAY_PREVIEW_TOKEN }}
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-          railway environment preview
-          railway up
-        else
-          railway login --token ${{ secrets.RAILWAY_TOKEN }}
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-          railway environment production
-          railway up
-        fi
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway environment ${{ github.event.inputs.environment || 'production' }}
+        railway up
       env:
         NODE_ENV: ${{ github.event.inputs.environment || 'production' }}
