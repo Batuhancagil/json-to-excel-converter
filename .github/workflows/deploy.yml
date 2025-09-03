@@ -1,20 +1,10 @@
-name: Deploy to Multiple Environments
+name: Branch-Based Deployment
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, preview ]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deploy Environment'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-        - production
-        - preview
+    branches: [ main, preview ]
 
 jobs:
   test:
@@ -50,9 +40,9 @@ jobs:
   deploy-production:
     needs: test
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.event_name == 'push' || github.event.inputs.environment == 'production')
+    if: github.ref == 'refs/heads/main'
     environment: production
-    name: Deploy to Production
+    name: Deploy to Production (Main Branch)
     
     steps:
     - name: Checkout code
@@ -71,6 +61,7 @@ jobs:
         npm install -g @railway/cli
         echo ${{ secrets.RAILWAY_TOKEN }} | railway login
         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway environment production
         railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -78,9 +69,9 @@ jobs:
   deploy-preview:
     needs: test
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.event_name == 'push' || github.event.inputs.environment == 'preview')
+    if: github.ref == 'refs/heads/preview'
     environment: preview
-    name: Deploy to Preview
+    name: Deploy to Preview (Preview Branch)
     
     steps:
     - name: Checkout code
@@ -95,6 +86,29 @@ jobs:
         railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        NODE_ENV: preview
+
+  deploy-preview-pr:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_name == 'main'
+    environment: preview
+    name: Deploy Preview for PR (Main → Preview)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Railway (Preview for PR)
+      run: |
+        npm install -g @railway/cli
+        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway environment preview
+        railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        NODE_ENV: preview
 
   manual-deploy:
     needs: test
@@ -115,7 +129,9 @@ jobs:
         if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
           railway environment preview
           railway up --service ${{ secrets.RAILWAY_PREVIEW_SERVICE_ID }}
+          echo "NODE_ENV=preview" >> $GITHUB_ENV
         else
+          railway environment production
           railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
         fi
       env:

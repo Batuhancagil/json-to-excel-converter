@@ -28,24 +28,33 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 
 **[🌐 Online Versiyonu Deneyin](https://json-to-excel-converter.vercel.app)**
 
-## 🔄 Dual Environment Deployment
+## 🔄 Branch-Based Environment Deployment
 
-Bu proje hem **Production** hem de **Preview** environment'larına deploy edilebilir.
+Bu proje **GitHub branch'leri** ile environment'ları yönetir:
 
-### 🏭 Production Environment
+### 🌿 Main Branch → Production
 - **Vercel**: Otomatik deploy (main branch push)
-- **Railway**: Production PostgreSQL ile
+- **Railway**: Production environment + PostgreSQL
 - **URL**: Ana production URL
+- **Güvenlik**: Sadece test edilmiş, onaylanmış kodlar
 
-### 🧪 Preview Environment  
-- **Railway**: Preview PostgreSQL ile
+### 🧪 Preview Branch → Preview
+- **Railway**: Preview environment + Fallback mode
 - **Test**: Yeni özellikler için güvenli test alanı
 - **URL**: Preview URL
+- **Geliştirme**: Deneysel özellikler, test edilecek kodlar
+
+### 🔄 Pull Request Workflow
+1. **Preview branch**'te geliştir
+2. **Pull Request** oluştur (preview → main)
+3. **Otomatik test** + preview deploy
+4. **Code review** + onay
+5. **Merge** → Production'a otomatik deploy
 
 ### 🚀 Manuel Deploy
 GitHub Actions'da manuel deploy tetikleyebilirsin:
 1. **Actions** sekmesine git
-2. **"Deploy to Multiple Environments"** workflow'unu seç
+2. **"Branch-Based Deployment"** workflow'unu seç
 3. **"Run workflow"** butonuna tıkla
 4. **Environment** seç: `production` veya `preview`
 
