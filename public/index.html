@@ -151,6 +151,130 @@
             box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
         }
         
+        /* Excel Preview Stilleri */
+        .excel-preview-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .excel-preview-header {
+            background: linear-gradient(135deg, #0066cc, #0099ff);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .excel-preview-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .excel-tab {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .excel-tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        .excel-tab.active {
+            background: white;
+            color: #0066cc;
+            font-weight: 600;
+        }
+        
+        .excel-preview-info {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .excel-preview-content {
+            display: none;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .excel-preview-content.active {
+            display: block;
+        }
+        
+        /* Tablo Görünümü */
+        .excel-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        .excel-preview-table th {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .excel-preview-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            color: #212529;
+        }
+        
+        .excel-preview-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .excel-preview-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        /* Grid Görünümü */
+        .excel-preview-grid {
+            display: grid;
+            gap: 1px;
+            background: #dee2e6;
+            border: 1px solid #dee2e6;
+        }
+        
+        .excel-grid-cell {
+            background: white;
+            padding: 8px;
+            font-size: 0.9em;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .excel-grid-header {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .excel-grid-row:nth-child(even) .excel-grid-cell {
+            background: #f8f9fa;
+        }
+        
+        .excel-grid-row:hover .excel-grid-cell {
+            background: #e9ecef;
+        }
+        
         .btn-warning {
             background: linear-gradient(135deg, #ffc107, #e0a800);
         }
@@ -860,6 +984,39 @@
                 <!-- Eski alan seçimi gizlendi -->
                 <div id="fieldsContainer" class="fields-container" style="display: none;"></div>
 
+                <!-- Excel Preview Kutusu -->
+                <div id="excelPreviewSection" class="section hidden" style="background: #f0f8ff; border: 2px solid #0066cc; margin-top: 20px;">
+                    <h3>📊 Excel Preview</h3>
+                    <p style="color: #0066cc; margin-bottom: 15px;">Seçilen alanlara göre Excel'de nasıl görüneceğini önizleyin:</p>
+                    
+                    <div class="excel-preview-container">
+                        <div class="excel-preview-header">
+                            <div class="excel-preview-tabs">
+                                <button class="excel-tab active" onclick="switchExcelTab('table')">📋 Tablo Görünümü</button>
+                                <button class="excel-tab" onclick="switchExcelTab('grid')">🔲 Grid Görünümü</button>
+                            </div>
+                            <div class="excel-preview-info">
+                                <span id="excelPreviewStats">0 alan, 0 kayıt</span>
+                            </div>
+                        </div>
+                        
+                        <div id="excelTablePreview" class="excel-preview-content active">
+                            <div class="excel-table-wrapper">
+                                <table id="excelPreviewTable" class="excel-preview-table">
+                                    <thead id="excelPreviewHeader"></thead>
+                                    <tbody id="excelPreviewBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div id="excelGridPreview" class="excel-preview-content">
+                            <div class="excel-grid-wrapper">
+                                <div id="excelPreviewGrid" class="excel-preview-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Excel Dosya Adı Girişi -->
                 <div id="excelFilenameSection" class="excel-filename-section hidden">
                     <label for="excelFilename" class="filename-label">📁 Excel Dosya Adı (Opsiyonel):</label>
@@ -1541,6 +1698,9 @@
             fieldsCheckboxes.forEach(checkbox => {
                 checkbox.closest('.field-checkbox').classList.add('selected');
             });
+            
+            // Excel preview'ı güncelle
+            updateExcelPreview();
         }
         
         function getSelectedFields() {
@@ -2006,6 +2166,132 @@
             });
         }
 
+        // Excel Preview Fonksiyonları
+        function updateExcelPreview() {
+            if (!uploadedData || !availableFields) return;
+            
+            const selectedFields = getSelectedFields();
+            if (selectedFields.length === 0) {
+                hideExcelPreview();
+                return;
+            }
+            
+            showExcelPreview();
+            updateExcelPreviewStats(selectedFields.length);
+            renderExcelPreview(selectedFields);
+        }
+        
+        function showExcelPreview() {
+            document.getElementById('excelPreviewSection').classList.remove('hidden');
+        }
+        
+        function hideExcelPreview() {
+            document.getElementById('excelPreviewSection').classList.add('hidden');
+        }
+        
+        function updateExcelPreviewStats(fieldCount) {
+            const recordCount = Array.isArray(uploadedData) ? uploadedData.length : 
+                               (uploadedData.data ? uploadedData.data.length : 0);
+            document.getElementById('excelPreviewStats').textContent = 
+                `${fieldCount} alan, ${recordCount} kayıt`;
+        }
+        
+        function renderExcelPreview(selectedFields) {
+            renderExcelTablePreview(selectedFields);
+            renderExcelGridPreview(selectedFields);
+        }
+        
+        function renderExcelTablePreview(selectedFields) {
+            const header = document.getElementById('excelPreviewHeader');
+            const body = document.getElementById('excelPreviewBody');
+            
+            // Header oluştur
+            header.innerHTML = selectedFields.map(field => 
+                `<th>${field}</th>`
+            ).join('');
+            
+            // Body oluştur (ilk 10 kayıt)
+            const data = Array.isArray(uploadedData) ? uploadedData : 
+                         (uploadedData.data ? uploadedData.data : []);
+            const previewData = data.slice(0, 10);
+            
+            body.innerHTML = previewData.map(record => 
+                `<tr>${selectedFields.map(field => 
+                    `<td>${formatCellValue(record[field])}</td>`
+                ).join('')}</tr>`
+            ).join('');
+            
+            if (data.length > 10) {
+                body.innerHTML += `<tr><td colspan="${selectedFields.length}" style="text-align: center; color: #6c757d; font-style: italic;">
+                    ... ve ${data.length - 10} kayıt daha
+                </td></tr>`;
+            }
+        }
+        
+        function renderExcelGridPreview(selectedFields) {
+            const grid = document.getElementById('excelPreviewGrid');
+            grid.innerHTML = ''; // Önceki içeriği temizle
+            
+            // Grid template oluştur
+            grid.style.gridTemplateColumns = `repeat(${selectedFields.length}, 1fr)`;
+            
+            // Header
+            selectedFields.forEach(field => {
+                const headerCell = document.createElement('div');
+                headerCell.className = 'excel-grid-cell excel-grid-header';
+                headerCell.textContent = field;
+                grid.appendChild(headerCell);
+            });
+            
+            // Data (ilk 5 kayıt)
+            const data = Array.isArray(uploadedData) ? uploadedData : 
+                         (uploadedData.data ? uploadedData.data : []);
+            const previewData = data.slice(0, 5);
+            
+            previewData.forEach(record => {
+                selectedFields.forEach(field => {
+                    const cell = document.createElement('div');
+                    cell.className = 'excel-grid-cell';
+                    cell.textContent = formatCellValue(record[field]);
+                    grid.appendChild(cell);
+                });
+            });
+            
+            if (data.length > 5) {
+                const moreCell = document.createElement('div');
+                moreCell.className = 'excel-grid-cell';
+                moreCell.style.gridColumn = `1 / -1`;
+                moreCell.style.textAlign = 'center';
+                moreCell.style.color = '#6c757d';
+                moreCell.style.fontStyle = 'italic';
+                moreCell.textContent = `... ve ${data.length - 5} kayıt daha`;
+                grid.appendChild(moreCell);
+            }
+        }
+        
+        function formatCellValue(value) {
+            if (value === null || value === undefined) return '-';
+            if (typeof value === 'object') return JSON.stringify(value);
+            if (typeof value === 'string' && value.length > 50) {
+                return value.substring(0, 50) + '...';
+            }
+            return String(value);
+        }
+        
+        function switchExcelTab(tabName) {
+            // Tüm tab'ları deaktif et
+            document.querySelectorAll('.excel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.excel-preview-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Seçilen tab'ı aktif et
+            event.target.classList.add('active');
+            document.getElementById(`excel${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Preview`).classList.add('active');
+        }
+        
         function saveCurrentSelectionAsTemplate() {
             const selectedFields = getSelectedFields();
             
