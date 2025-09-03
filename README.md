@@ -26,22 +26,22 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 
 ## 🚀 Canlı Demo
 
-**[🌐 Online Versiyonu Deneyin](https://json-to-excel-converter.vercel.app)**
+**[🌐 Production Versiyonu](https://json-to-excel-converter-production.up.railway.app)**  
+**[🧪 Preview Versiyonu](https://json-to-excel-converter-preview.up.railway.app)**
 
 ## 🔄 Branch-Based Environment Deployment
 
 Bu proje **GitHub branch'leri** ile environment'ları yönetir:
 
 ### 🌿 Main Branch → Production
-- **Vercel**: Otomatik deploy (main branch push)
 - **Railway**: Production environment + PostgreSQL
-- **URL**: Ana production URL
+- **URL**: https://json-to-excel-converter-production.up.railway.app
 - **Güvenlik**: Sadece test edilmiş, onaylanmış kodlar
 
 ### 🧪 Preview Branch → Preview
 - **Railway**: Preview environment + Fallback mode
 - **Test**: Yeni özellikler için güvenli test alanı
-- **URL**: Preview URL
+- **URL**: https://json-to-excel-converter-preview.up.railway.app
 - **Geliştirme**: Deneysel özellikler, test edilecek kodlar
 
 ### 🔄 Pull Request Workflow
@@ -62,22 +62,12 @@ GitHub Actions'da manuel deploy tetikleyebilirsin:
 
 Dual environment deploy için şu secrets'ları ekle:
 
-#### Vercel (Production)
-- `VERCEL_TOKEN`: Vercel API token
-- `VERCEL_ORG_ID`: Vercel organization ID  
-- `VERCEL_PROJECT_ID`: Vercel project ID
-
 #### Railway (Production + Preview)
 - `RAILWAY_TOKEN`: Railway API token
 - `RAILWAY_PROJECT_ID`: Railway project ID
-- `RAILWAY_SERVICE_ID`: Production service ID
-- `RAILWAY_PREVIEW_SERVICE_ID`: Preview service ID
 
-#### Railway Service ID'lerini Bul
-1. **Railway Dashboard**'da projene git
-2. **Production environment**'da service'e tıkla
-3. **Settings** → **General** → **Service ID** kopyala
-4. **Preview environment** için aynısını yap
+
+
 
 ## 📦 Kurulum
 
@@ -162,15 +152,7 @@ DELETE /delete-template/:id # Template sil
 
 ## 🚀 Deployment
 
-### Vercel (Önerilen)
-```bash
-# Vercel CLI ile
-npm i -g vercel
-vercel
 
-# GitHub ile otomatik
-# Repository'yi Vercel'e bağla
-```
 
 ### Heroku
 ```bash
