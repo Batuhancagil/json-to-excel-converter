@@ -1367,9 +1367,9 @@
                 if (Array.isArray(value)) {
                     html += `
                         <div style="margin: 5px 0; padding: 8px; background: #f0f9ff; border-radius: 5px; border-left: 3px solid #4facfe;">
-                            <strong style="color: #4facfe;">${indent}📋 ${key} (Array - ${value.length} öğe)</strong>
+                            <strong style="color: #4facfe;">${indent}📋 ${key} (Array - ${value.length} <span class="array-items-text">öğe</span>)</strong>
                             <button class="btn btn-sm" onclick="toggleArrayPreview('${fullKey}')" style="margin-left: 10px;">
-                                📖 Detayları Göster
+                                📖 <span class="show-details-text">Detayları Göster</span>
                             </button>
                             <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
                                 ${value.length > 0 ? createRecordPreviewHTML(value[0], fullKey, level + 1) : '<span style="color: #6c757d;">Boş array</span>'}
@@ -1381,7 +1381,7 @@
                         <div style="margin: 5px 0; padding: 8px; background: #fff5f5; border-radius: 5px; border-left: 3px solid #ff6b6b;">
                             <strong style="color: #ff6b6b;">${indent}🔍 ${key} (Object)</strong>
                             <button class="btn btn-sm" onclick="toggleObjectPreview('${fullKey}')" style="margin-left: 10px;">
-                                📖 Detayları Göster
+                                📖 <span class="show-details-text">Detayları Göster</span>
                             </button>
                             <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
                                 ${createRecordPreviewHTML(value, fullKey, level + 1)}
@@ -1406,7 +1406,7 @@
                                    value="${fullKey}" onchange="syncCheckboxWithPreview('${fullKey}')" 
                                    style="margin-left: 15px;">
                             <label for="preview_checkbox_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="margin-left: 5px; font-size: 12px;">
-                                Excel'e Ekle
+                                <span id="addToExcelText">Excel'e Ekle</span>
                             </label>
                         </div>
                     `;
@@ -1426,10 +1426,10 @@
             
             if (previewDiv.style.display === 'none') {
                 previewDiv.style.display = 'block';
-                button.textContent = '📖 Detayları Gizle';
+                button.innerHTML = '📖 <span class="hide-details-text">Detayları Gizle</span>';
             } else {
                 previewDiv.style.display = 'none';
-                button.textContent = '📖 Detayları Göster';
+                button.innerHTML = '📖 <span class="show-details-text">Detayları Göster</span>';
             }
         }
 
@@ -1440,10 +1440,10 @@
             
             if (previewDiv.style.display === 'none') {
                 previewDiv.style.display = 'block';
-                button.textContent = '📖 Detayları Gizle';
+                button.innerHTML = '📖 <span class="hide-details-text">Detayları Gizle</span>';
             } else {
                 previewDiv.style.display = 'none';
-                button.textContent = '📖 Detayları Göster';
+                button.innerHTML = '📖 <span class="show-details-text">Detayları Göster</span>';
             }
         }
 
@@ -1525,7 +1525,7 @@
         function expandAllPreviews() {
             const buttons = document.querySelectorAll('#previewContainer button');
             buttons.forEach(button => {
-                if (button.textContent.includes('Detayları Göster')) {
+                if (button.innerHTML.includes('Detayları Göster')) {
                     button.click();
                 }
             });
@@ -1534,7 +1534,7 @@
         function collapseAllPreviews() {
             const buttons = document.querySelectorAll('#previewContainer button');
             buttons.forEach(button => {
-                if (button.textContent.includes('Detayları Gizle')) {
+                if (button.innerHTML.includes('Detayları Gizle')) {
                     button.click();
                 }
             });
@@ -1894,6 +1894,10 @@
                 templateNotFound: "Template bulunamadı",
                 templateNamePlaceholder: "Template adını girin",
                 excelFilenamePlaceholder: "ornek_veri",
+                addToExcel: "Excel'e Ekle",
+                arrayItems: "öğe",
+                showDetails: "Detayları Göster",
+                hideDetails: "Detayları Gizle",
                 sampleDataLoaded: "Örnek veri yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
@@ -1953,6 +1957,10 @@
                 templateNotFound: "Template not found",
                 templateNamePlaceholder: "Enter template name",
                 excelFilenamePlaceholder: "sample_data",
+                addToExcel: "Add to Excel",
+                arrayItems: "items",
+                showDetails: "Show Details",
+                hideDetails: "Hide Details",
                 sampleDataLoaded: "Sample data loaded. Now click \"Upload Data\" button.",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
@@ -2011,6 +2019,19 @@
                 templateSelect.options[0].text = t.noTemplateOption;
                 document.getElementById('templateName').placeholder = t.templateNamePlaceholder;
                 document.getElementById('excelFilename').placeholder = t.excelFilenamePlaceholder;
+                
+                // Update dynamic texts
+                const addToExcelTexts = document.querySelectorAll('#addToExcelText');
+                addToExcelTexts.forEach(el => el.textContent = t.addToExcel);
+                
+                const arrayItemsTexts = document.querySelectorAll('.array-items-text');
+                arrayItemsTexts.forEach(el => el.textContent = t.arrayItems);
+                
+                const showDetailsTexts = document.querySelectorAll('.show-details-text');
+                showDetailsTexts.forEach(el => el.textContent = t.showDetails);
+                
+                const hideDetailsTexts = document.querySelectorAll('.hide-details-text');
+                hideDetailsTexts.forEach(el => el.textContent = t.hideDetails);
             }
             
             // Update field selection section if visible
