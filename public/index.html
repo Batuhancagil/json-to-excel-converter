@@ -922,7 +922,7 @@
                         <div class="history-section">
                             <label for="historySelect" class="history-label" id="historyLabel">📚 Seçim Geçmişi:</label>
                             <select id="historySelect" class="history-select">
-                                <option value="">Seçim geçmişi yok</option>
+                                <option value="" id="noHistoryOption">Seçim geçmişi yok</option>
                             </select>
                 </div>
                         
@@ -941,7 +941,7 @@
                             <div class="template-section" style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
                                 <label for="templateSelect" class="template-label" id="templateLabel">Template:</label>
                                 <select id="templateSelect" class="template-select">
-                                    <option value="">Template yok</option>
+                                    <option value="" id="noTemplateOption">Template yok</option>
                                 </select>
                                 <button class="btn btn-sm btn-success" onclick="applySelectedTemplate()" id="templateApplyBtn">🚀 Uygula</button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteSelectedTemplate()" id="templateDeleteBtn">🗑️ Sil</button>
@@ -1355,7 +1355,8 @@
         }
 
         function createRecordPreviewHTML(data, prefix = '', level = 0) {
-            if (level > 3) return '<span style="color: #6c757d;">... (çok derin)</span>';
+            const t = translations[currentLanguage];
+            if (level > 3) return `<span style="color: #6c757d;">... (${t.tooDeep})</span>`;
             
             let html = '<div style="font-family: monospace; font-size: 13px;">';
             
@@ -1367,12 +1368,12 @@
                 if (Array.isArray(value)) {
                     html += `
                         <div style="margin: 5px 0; padding: 8px; background: #f0f9ff; border-radius: 5px; border-left: 3px solid #4facfe;">
-                            <strong style="color: #4facfe;">${indent}📋 ${key} (Array - ${value.length} <span class="array-items-text">öğe</span>)</strong>
+                            <strong style="color: #4facfe;">${indent}📋 ${key} (Array - ${value.length} <span class="array-items-text">${t.arrayItems}</span>)</strong>
                             <button class="btn btn-sm" onclick="toggleArrayPreview('${fullKey}')" style="margin-left: 10px;">
-                                📖 <span class="show-details-text">Detayları Göster</span>
+                                📖 <span class="show-details-text">${t.showDetails}</span>
                             </button>
                             <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
-                                ${value.length > 0 ? createRecordPreviewHTML(value[0], fullKey, level + 1) : '<span style="color: #6c757d;">Boş array</span>'}
+                                ${value.length > 0 ? createRecordPreviewHTML(value[0], fullKey, level + 1) : `<span style="color: #6c757d;">${t.emptyArray}</span>`}
                             </div>
                         </div>
                     `;
@@ -1381,7 +1382,7 @@
                         <div style="margin: 5px 0; padding: 8px; background: #fff5f5; border-radius: 5px; border-left: 3px solid #ff6b6b;">
                             <strong style="color: #ff6b6b;">${indent}🔍 ${key} (Object)</strong>
                             <button class="btn btn-sm" onclick="toggleObjectPreview('${fullKey}')" style="margin-left: 10px;">
-                                📖 <span class="show-details-text">Detayları Göster</span>
+                                📖 <span class="show-details-text">${t.showDetails}</span>
                             </button>
                             <div id="preview_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="display: none; margin-top: 10px;">
                                 ${createRecordPreviewHTML(value, fullKey, level + 1)}
@@ -1406,7 +1407,7 @@
                                    value="${fullKey}" onchange="syncCheckboxWithPreview('${fullKey}')" 
                                    style="margin-left: 15px;">
                             <label for="preview_checkbox_${fullKey.replace(/[^a-zA-Z0-9]/g, '_')}" style="margin-left: 5px; font-size: 12px;">
-                                <span id="addToExcelText">Excel'e Ekle</span>
+                                <span class="add-to-excel-text">${t.addToExcel}</span>
                             </label>
                         </div>
                     `;
@@ -1898,6 +1899,8 @@
                 arrayItems: "öğe",
                 showDetails: "Detayları Göster",
                 hideDetails: "Detayları Gizle",
+                tooDeep: "çok derin",
+                emptyArray: "Boş array",
                 sampleDataLoaded: "Örnek veri yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
@@ -1961,6 +1964,8 @@
                 arrayItems: "items",
                 showDetails: "Show Details",
                 hideDetails: "Hide Details",
+                tooDeep: "too deep",
+                emptyArray: "Empty array",
                 sampleDataLoaded: "Sample data loaded. Now click \"Upload Data\" button.",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
@@ -2012,16 +2017,20 @@
             // Update dropdown options
             const historySelect = document.getElementById('historySelect');
             const templateSelect = document.getElementById('templateSelect');
-            if (historySelect && historySelect.options.length > 0) {
-                historySelect.options[0].text = t.noHistoryOption;
+            // Update dropdown options
+            const noHistoryOption = document.getElementById('noHistoryOption');
+            if (noHistoryOption) {
+                noHistoryOption.textContent = t.noHistoryOption;
             }
-            if (templateSelect && templateSelect.options.length > 0) {
-                templateSelect.options[0].text = t.noTemplateOption;
+            const noTemplateOption = document.getElementById('noTemplateOption');
+            if (noTemplateOption) {
+                noTemplateOption.textContent = t.noTemplateOption;
+            }
                 document.getElementById('templateName').placeholder = t.templateNamePlaceholder;
                 document.getElementById('excelFilename').placeholder = t.excelFilenamePlaceholder;
                 
                 // Update dynamic texts
-                const addToExcelTexts = document.querySelectorAll('#addToExcelText');
+                const addToExcelTexts = document.querySelectorAll('.add-to-excel-text');
                 addToExcelTexts.forEach(el => el.textContent = t.addToExcel);
                 
                 const arrayItemsTexts = document.querySelectorAll('.array-items-text');
@@ -2131,7 +2140,8 @@
         // Seçim Geçmişi Fonksiyonları
         function updateHistoryDropdown() {
             const historySelect = document.getElementById('historySelect');
-            historySelect.innerHTML = '<option value="">Seçim geçmişi yok</option>';
+            const t = translations[currentLanguage];
+            historySelect.innerHTML = `<option value="">${t.noHistoryOption}</option>`;
             
             if (selectionHistory.length === 0) {
                 return;
@@ -2335,7 +2345,8 @@
         // Template Fonksiyonları
         function updateTemplateDropdown() {
             const templateSelect = document.getElementById('templateSelect');
-            templateSelect.innerHTML = '<option value="">Template yok</option>';
+            const t = translations[currentLanguage];
+            templateSelect.innerHTML = `<option value="">${t.noTemplateOption}</option>`;
             
             if (templates.length === 0) {
                 return;
