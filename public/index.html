@@ -1273,6 +1273,9 @@
                     showFieldSelection();
                     updateHistoryDropdown();
                     updateTemplateDropdown();
+                    
+                    // currentData'yı güncelle
+                    currentData = jsonData;
                     updateExcelPreview();
                     
                     // İndirme butonunu görünür yap
@@ -1756,14 +1759,8 @@
             const previewSelected = Array.from(document.querySelectorAll('#previewContainer input[type="checkbox"]:checked'))
                 .map(checkbox => checkbox.value);
             
-            // Debug için console.log ekle
-            console.log('fieldsSelected:', fieldsSelected);
-            console.log('previewSelected:', previewSelected);
-            
             // Tekrar eden alanları kaldır ve döndür
-            const allSelected = [...new Set([...fieldsSelected, ...previewSelected])];
-            console.log('allSelected:', allSelected);
-            return allSelected;
+            return [...new Set([...fieldsSelected, ...previewSelected])];
         }
 
         function convertToExcel() {
@@ -2045,6 +2042,7 @@
         };
 
         let currentLanguage = 'en';
+        let currentData = []; // Excel preview için güncel veri
 
         function toggleLanguage() {
             const toggle = document.getElementById('languageToggle');
@@ -2221,7 +2219,6 @@
             if (!previewContainer || !previewSection) return;
             
             const selectedFields = getSelectedFields();
-            console.log('updateExcelPreview - selectedFields:', selectedFields);
             
             if (selectedFields.length === 0) {
                 previewContainer.innerHTML = `<p style="color: #6c757d; text-align: center; padding: 20px;" id="excelPreviewEmpty">${translations[currentLanguage].excelPreviewEmpty}</p>`;
