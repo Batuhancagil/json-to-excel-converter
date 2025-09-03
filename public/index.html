@@ -1022,7 +1022,7 @@
                     <label for="templateName" style="display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50;">
                         Template Adı:
                     </label>
-                    <input type="text" id="templateName" placeholder="Örn: Müşteri Verileri, Ürün Listesi" 
+                    <input type="text" id="templateName" placeholder="" 
                            style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
                 </div>
                 
@@ -1793,7 +1793,7 @@
             ];
             
             document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
-            showStatus('Örnek veri yüklendi. Şimdi "JSON Yükle" butonuna tıklayın.', 'info');
+            showStatus(translations[currentLanguage].sampleDataLoaded, 'info');
         }
         
         // JSON'ı TXT olarak indir
@@ -1892,6 +1892,8 @@
                 templateNameRequired: "Template adı gerekli",
                 templateSaved: "template'i kaydedildi",
                 templateNotFound: "Template bulunamadı",
+                templateNamePlaceholder: "Template adını girin",
+                sampleDataLoaded: "Örnek veri yüklendi. Şimdi \"Veri Yükle\" butonuna tıklayın.",
                 useUploadAreas: "JSON verisi yüklemek için yukarıdaki alanları kullanın"
             },
             en: {
@@ -1948,6 +1950,8 @@
                 templateNameRequired: "Template name is required",
                 templateSaved: "template saved",
                 templateNotFound: "Template not found",
+                templateNamePlaceholder: "Enter template name",
+                sampleDataLoaded: "Sample data loaded. Now click \"Upload Data\" button.",
                 useUploadAreas: "Use the areas above to upload JSON data"
             }
         };
@@ -2003,6 +2007,7 @@
             }
             if (templateSelect && templateSelect.options.length > 0) {
                 templateSelect.options[0].text = t.noTemplateOption;
+                document.getElementById('templateName').placeholder = t.templateNamePlaceholder;
             }
             
             // Update field selection section if visible
