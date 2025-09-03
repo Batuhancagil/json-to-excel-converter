@@ -19,6 +19,8 @@ on:
         options:
         - main
         - preview
+  push:
+    branches: [ main ]
 
 jobs:
   test:
@@ -56,19 +58,19 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
-    name: Deploy to ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    name: Deploy to ${{ github.event.inputs.environment || 'production' }}
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.branch }}
+        ref: ${{ github.event.inputs.branch || github.ref_name }}
       
-    - name: Deploy to Railway (${{ github.event.inputs.environment }})
+    - name: Deploy to Railway (${{ github.event.inputs.environment || 'production' }})
       run: |
         npm install -g @railway/cli
-        if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
+        if [ "${{ github.event.inputs.environment || 'production' }}" = "preview" ]; then
           echo ${{ secrets.RAILWAY_PREVIEW_TOKEN }} | railway login
           railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
           railway environment preview
@@ -81,4 +83,4 @@ jobs:
         fi
       env:
         RAILWAY_TOKEN: ${{ github.event.inputs.environment == 'preview' && secrets.RAILWAY_PREVIEW_TOKEN || secrets.RAILWAY_TOKEN }}
-        NODE_ENV: ${{ github.event.inputs.environment }}
+        NODE_ENV: ${{ github.event.inputs.environment || 'production' }}

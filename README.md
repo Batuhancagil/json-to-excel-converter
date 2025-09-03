@@ -31,7 +31,16 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 
 ## 🚀 Manual Deployment System
 
-Bu proje **manuel deployment** sistemi kullanır:
+Bu proje **hibrit deployment** sistemi kullanır:
+
+### 🚀 Otomatik Production Deploy
+- **Main branch**'e push → **Otomatik production deploy**
+- **Gerçek proje** için main branch kullanın
+
+### 🧪 Manuel Preview Deploy  
+- **Preview branch**'te geliştirme yapın
+- **Test** için manuel preview deploy
+- **Onay** sonrası main'e eşitleyin
 
 ### 🌿 Main Branch → Production
 - **Railway**: Production environment + PostgreSQL
@@ -51,12 +60,34 @@ Bu proje **manuel deployment** sistemi kullanır:
 4. **Code review** + onay
 5. **Merge** → Production'a otomatik deploy
 
-### 🚀 Manuel Deploy
-GitHub Actions'da manuel deploy tetikleyebilirsin:
-1. **Actions** sekmesine git
-2. **"Branch-Based Deployment"** workflow'unu seç
-3. **"Run workflow"** butonuna tıkla
-4. **Environment** seç: `production` veya `preview`
+### 🔄 Geliştirme Workflow'u
+
+#### **1. Geliştirme (Preview Branch)**
+```bash
+git checkout preview
+# Kod geliştir
+git add .
+git commit -m "Yeni özellik"
+git push origin preview
+```
+
+#### **2. Test (Manuel Preview Deploy)**
+- GitHub Actions → Manual Railway Deployment
+- Environment: `preview`, Branch: `preview`
+- Test et, onayla
+
+#### **3. Production'a Eşitleme**
+```bash
+git checkout main
+git merge preview
+git push origin main
+# Otomatik production deploy başlar
+```
+
+### 🚀 Manuel Deploy (İsteğe Bağlı)
+- GitHub Actions → Manual Railway Deployment
+- Environment ve branch seç
+- Deploy et
 
 ### 🔐 GitHub Secrets Kurulumu
 
