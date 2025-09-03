@@ -972,13 +972,10 @@
                     <small class="filename-help">Boş bırakırsanız otomatik isim kullanılır</small>
                 </div>
 
-                <div class="actions">
+                <div class="actions" style="display: flex; justify-content: center; align-items: center;">
                     <button class="btn" onclick="convertToExcel()" id="convertBtn">
                         <span class="loading hidden" id="convertLoading"></span>
                         <span id="convertBtnText">📊 Excel'e Dönüştür</span>
-                    </button>
-                    <button class="btn btn-danger" onclick="clearData()" id="clearBtn">
-                        <span id="clearBtnText">🗑️ Verileri Temizle</span>
                     </button>
                 </div>
             </div>
@@ -1762,32 +1759,7 @@
             });
         }
 
-        function clearData() {
-            fetch('/clear', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        uploadedData = null;
-                        availableFields = [];
-                        document.getElementById('jsonInput').value = '';
-                        document.getElementById('statusSection').classList.add('hidden');
-                        document.getElementById('statsSection').classList.add('hidden');
-                        document.getElementById('fieldSelectionSection').classList.add('hidden');
-                        document.getElementById('excelFilenameSection').classList.add('hidden');
-                        
-                        // İndirme butonunu gizle
-                        document.getElementById('downloadBtn').style.display = 'none';
-                        
-                        showStatus('Veriler temizlendi', 'info');
-                        setTimeout(() => {
-                            document.getElementById('statusSection').classList.add('hidden');
-                        }, 2000);
-                    }
-                })
-                .catch(error => {
-                    showStatus('Hata: ' + error.message, 'error');
-                });
-        }
+
 
         function loadSampleData() {
             const sampleData = [
@@ -1890,7 +1862,7 @@
                 debug: "🐛 Debug",
                 saveTemplate: "💾 Template Kaydet",
                 convertBtn: "📊 Excel'e Dönüştür",
-                clearBtn: "🗑️ Tüm Verileri Temizle",
+
                 applyBtn: "✅ Uygula",
                 applyLastBtn: "⚡ Son Seçimi Uygula",
                 smartBtn: "🧠 Akıllı Seçim",
@@ -1922,7 +1894,7 @@
                 debug: "🐛 Debug",
                 saveTemplate: "💾 Save Template",
                 convertBtn: "📊 Convert to Excel",
-                clearBtn: "🗑️ Clear All Data",
+
                 applyBtn: "✅ Apply",
                 applyLastBtn: "⚡ Apply Last Selection",
                 smartBtn: "🧠 Smart Match",
@@ -1960,7 +1932,6 @@
             document.getElementById('fieldSelectionTitle').textContent = t.fieldSelectionTitle;
             document.getElementById('fieldSelectionDescription').textContent = t.fieldSelectionDescription;
             document.getElementById('convertBtnText').textContent = t.convertBtn;
-            document.getElementById('clearBtnText').textContent = t.clearBtn;
             document.getElementById('applyBtn').textContent = t.applyBtn;
             document.getElementById('applyLastBtn').textContent = t.applyLastBtn;
             document.getElementById('smartBtn').textContent = t.smartBtn;
