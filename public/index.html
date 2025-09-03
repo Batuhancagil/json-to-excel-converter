@@ -1355,7 +1355,7 @@
         }
 
         function createRecordPreviewHTML(data, prefix = '', level = 0) {
-            const t = translations[currentLanguage];
+            const t = translations[currentLanguage] || translations['en'];
             if (level > 3) return `<span style="color: #6c757d;">... (${t.tooDeep})</span>`;
             
             let html = '<div style="font-family: monospace; font-size: 13px;">';
@@ -1980,7 +1980,7 @@
         }
 
         function updateLanguage() {
-            const t = translations[currentLanguage];
+            const t = translations[currentLanguage] || translations['en'];
             
             // Update all text elements
             document.getElementById('headerTitle').textContent = t.headerTitle;
@@ -2140,7 +2140,7 @@
         // Seçim Geçmişi Fonksiyonları
         function updateHistoryDropdown() {
             const historySelect = document.getElementById('historySelect');
-            const t = translations[currentLanguage];
+            const t = translations[currentLanguage] || translations['en'];
             historySelect.innerHTML = `<option value="">${t.noHistoryOption}</option>`;
             
             if (selectionHistory.length === 0) {
@@ -2345,7 +2345,7 @@
         // Template Fonksiyonları
         function updateTemplateDropdown() {
             const templateSelect = document.getElementById('templateSelect');
-            const t = translations[currentLanguage];
+            const t = translations[currentLanguage] || translations['en'];
             templateSelect.innerHTML = `<option value="">${t.noTemplateOption}</option>`;
             
             if (templates.length === 0) {
