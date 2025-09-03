@@ -2264,9 +2264,44 @@
         }
         
         function getNestedValue(obj, path) {
-            return path.split('.').reduce((current, key) => {
-                return current && current[key] !== undefined ? current[key] : null;
-            }, obj);
+            // Array alanları için özel işlem
+            if (path.includes('.')) {
+                const parts = path.split('.');
+                let current = obj;
+                
+                for (let i = 0; i < parts.length; i++) {
+                    const part = parts[i];
+                    
+                    if (Array.isArray(current)) {
+                        // Eğer current bir array ise, tüm elemanlarından değerleri topla
+                        if (i === parts.length - 1) {
+                            // Son parça ise, array'deki tüm elemanlardan bu değeri al
+                            return current.map(item => {
+                                if (item && typeof item === 'object' && item[part] !== undefined) {
+                                    return item[part];
+                                }
+                                return null;
+                            }).filter(val => val !== null);
+                        } else {
+                            // Orta parça ise, array'deki ilk elemandan devam et
+                            if (current.length > 0 && current[0] && typeof current[0] === 'object') {
+                                current = current[0][part];
+                            } else {
+                                return null;
+                            }
+                        }
+                    } else if (current && typeof current === 'object' && current[part] !== undefined) {
+                        current = current[part];
+                    } else {
+                        return null;
+                    }
+                }
+                
+                return current;
+            } else {
+                // Basit alan
+                return obj && obj[path] !== undefined ? obj[path] : null;
+            }
         }
         
         function formatPreviewValue(value) {
@@ -2274,12 +2309,26 @@
                 return '<span style="color: #6c757d; font-style: italic;">null</span>';
             }
             
-            if (typeof value === 'object') {
-                if (Array.isArray(value)) {
-                    return `<span style="color: #007bff;">Array (${value.length} items)</span>`;
+            if (Array.isArray(value)) {
+                // Array değerleri için özel formatlama
+                if (value.length === 0) {
+                    return '<span style="color: #6c757d; font-style: italic;">empty array</span>';
+                } else if (value.length === 1) {
+                    return String(value[0]);
                 } else {
-                    return `<span style="color: #28a745;">Object</span>`;
+                    // Birden fazla değer varsa, ilk birkaçını göster
+                    const displayValues = value.slice(0, 3).map(v => String(v));
+                    const remaining = value.length - 3;
+                    let result = displayValues.join(', ');
+                    if (remaining > 0) {
+                        result += ` (+${remaining} more)`;
+                    }
+                    return result;
                 }
+            }
+            
+            if (typeof value === 'object') {
+                return `<span style="color: #28a745;">Object</span>`;
             }
             
             if (typeof value === 'string' && value.length > 50) {
