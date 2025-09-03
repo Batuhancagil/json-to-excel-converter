@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Test and Build
 
 on:
   push:
@@ -36,20 +36,3 @@ jobs:
         sleep 5
         curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 | grep -q "200" || exit 1
         pkill -f "node index.js"
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Vercel
-      run: |
-        npm install -g vercel@latest
-        vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
-      env:
-        VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
