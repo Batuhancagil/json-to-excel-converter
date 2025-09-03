@@ -29,9 +29,9 @@ Modern, kullanıcı dostu JSON verilerini Excel formatına dönüştüren web uy
 **[🌐 Production Versiyonu](https://json-to-excel-converter-production.up.railway.app)**  
 **[🧪 Preview Versiyonu](https://json-to-excel-converter-preview.up.railway.app)**
 
-## 🔄 Branch-Based Environment Deployment
+## 🚀 Manual Deployment System
 
-Bu proje **GitHub branch'leri** ile environment'ları yönetir:
+Bu proje **manuel deployment** sistemi kullanır:
 
 ### 🌿 Main Branch → Production
 - **Railway**: Production environment + PostgreSQL

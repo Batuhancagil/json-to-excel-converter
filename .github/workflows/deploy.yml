@@ -1,10 +1,24 @@
-name: Branch-Based Deployment
+name: Manual Railway Deployment
 
 on:
-  push:
-    branches: [ main, preview ]
-  pull_request:
-    branches: [ main, preview ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - preview
+      branch:
+        description: 'Source Branch'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+        - main
+        - preview
 
 jobs:
   test:
@@ -39,97 +53,32 @@ jobs:
       env:
         NODE_ENV: test
 
-  deploy-production:
+  deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    name: Deploy to Production (Main Branch)
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-
-    - name: Deploy to Railway (Production)
-      run: |
-        npm install -g @railway/cli
-        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
-        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-        railway environment production
-        railway up
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-  deploy-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/preview'
-    environment: preview
-    name: Deploy to Preview (Preview Branch)
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Railway (Preview)
-      run: |
-        npm install -g @railway/cli
-        echo ${{ secrets.RAILWAY_PREVIEW_TOKEN }} | railway login
-        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-        railway environment preview
-        railway up
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_PREVIEW_TOKEN }}
-        NODE_ENV: preview
-
-  deploy-preview-pr:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.base_name == 'main'
-    environment: preview
-    name: Deploy Preview for PR (Main → Preview)
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Railway (Preview for PR)
-      run: |
-        npm install -g @railway/cli
-        echo ${{ secrets.RAILWAY_PREVIEW_TOKEN }} | railway login
-        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-        railway environment preview
-        railway up
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_PREVIEW_TOKEN }}
-        NODE_ENV: preview
-
-  manual-deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
     environment: ${{ github.event.inputs.environment }}
-    name: Manual Deploy to ${{ github.event.inputs.environment }}
+    name: Deploy to ${{ github.event.inputs.environment }}
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.branch }}
       
     - name: Deploy to Railway (${{ github.event.inputs.environment }})
       run: |
         npm install -g @railway/cli
-        echo ${{ secrets.RAILWAY_TOKEN }} | railway login
-        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
         if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
           echo ${{ secrets.RAILWAY_PREVIEW_TOKEN }} | railway login
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
           railway environment preview
           railway up
-          echo "NODE_ENV=preview" >> $GITHUB_ENV
         else
           echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
           railway environment production
           railway up
         fi
       env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        RAILWAY_TOKEN: ${{ github.event.inputs.environment == 'preview' && secrets.RAILWAY_PREVIEW_TOKEN || secrets.RAILWAY_TOKEN }}
+        NODE_ENV: ${{ github.event.inputs.environment }}
