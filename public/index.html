@@ -2239,18 +2239,67 @@
             });
             tableHTML += '</tr></thead>';
             
-            // Data rows (ilk 10 kayıt)
+            // Data rows - Array formatında
             tableHTML += '<tbody>';
-            const maxRows = Math.min(10, currentData.length);
-            for (let i = 0; i < maxRows; i++) {
+            const maxRecords = Math.min(10, currentData.length);
+            let totalRows = 0;
+            
+            for (let i = 0; i < maxRecords; i++) {
                 const record = currentData[i];
-                tableHTML += '<tr>';
-                selectedFields.forEach(field => {
-                    const value = getNestedValue(record, field);
-                    const displayValue = formatPreviewValue(value);
-                    tableHTML += `<td>${displayValue}</td>`;
-                });
-                tableHTML += '</tr>';
+                const arrayFields = selectedFields.filter(field => field.includes('.'));
+                const nonArrayFields = selectedFields.filter(field => !field.includes('.'));
+                
+                if (arrayFields.length > 0) {
+                    // Array alanları için özel işlem
+                    const arrayValues = arrayFields.map(field => getNestedValue(record, field));
+                    const maxArrayLength = Math.max(...arrayValues.map(arr => Array.isArray(arr) ? arr.length : 0));
+                    
+                    if (maxArrayLength > 0) {
+                        // Her array elemanı için ayrı satır
+                        for (let j = 0; j < maxArrayLength; j++) {
+                            tableHTML += '<tr>';
+                            selectedFields.forEach(field => {
+                                if (field.includes('.')) {
+                                    // Array alanı
+                                    const value = getNestedValue(record, field);
+                                    if (Array.isArray(value) && value[j] !== undefined) {
+                                        tableHTML += `<td>${formatPreviewValue(value[j])}</td>`;
+                                    } else {
+                                        tableHTML += '<td></td>';
+                                    }
+                                } else {
+                                    // Non-array alanı - sadece ilk satırda göster
+                                    if (j === 0) {
+                                        const value = getNestedValue(record, field);
+                                        tableHTML += `<td>${formatPreviewValue(value)}</td>`;
+                                    } else {
+                                        tableHTML += '<td></td>';
+                                    }
+                                }
+                            });
+                            tableHTML += '</tr>';
+                            totalRows++;
+                        }
+                    } else {
+                        // Array yoksa normal satır
+                        tableHTML += '<tr>';
+                        selectedFields.forEach(field => {
+                            const value = getNestedValue(record, field);
+                            tableHTML += `<td>${formatPreviewValue(value)}</td>`;
+                        });
+                        tableHTML += '</tr>';
+                        totalRows++;
+                    }
+                } else {
+                    // Array alanı yoksa normal işlem
+                    tableHTML += '<tr>';
+                    selectedFields.forEach(field => {
+                        const value = getNestedValue(record, field);
+                        tableHTML += `<td>${formatPreviewValue(value)}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                    totalRows++;
+                }
             }
             tableHTML += '</tbody>';
             
@@ -2306,25 +2355,7 @@
         
         function formatPreviewValue(value) {
             if (value === null || value === undefined) {
-                return '<span style="color: #6c757d; font-style: italic;">null</span>';
-            }
-            
-            if (Array.isArray(value)) {
-                // Array değerleri için özel formatlama
-                if (value.length === 0) {
-                    return '<span style="color: #6c757d; font-style: italic;">empty array</span>';
-                } else if (value.length === 1) {
-                    return String(value[0]);
-                } else {
-                    // Birden fazla değer varsa, ilk birkaçını göster
-                    const displayValues = value.slice(0, 3).map(v => String(v));
-                    const remaining = value.length - 3;
-                    let result = displayValues.join(', ');
-                    if (remaining > 0) {
-                        result += ` (+${remaining} more)`;
-                    }
-                    return result;
-                }
+                return '';
             }
             
             if (typeof value === 'object') {
