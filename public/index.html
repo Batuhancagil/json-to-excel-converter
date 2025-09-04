@@ -2320,8 +2320,8 @@
             tableHTML += '</tbody>';
             
             // Eğer daha fazla kayıt varsa bilgi ekle
-            if (currentData.length > maxRows) {
-                tableHTML += `<tfoot><tr><td colspan="${selectedFields.length}" style="text-align: center; font-style: italic; color: #6c757d; padding: 10px;">... and ${currentData.length - maxRows} more rows</td></tr></tfoot>`;
+            if (currentData.length > maxRecords) {
+                tableHTML += `<tfoot><tr><td colspan="${selectedFields.length}" style="text-align: center; font-style: italic; color: #6c757d; padding: 10px;">... and ${currentData.length - maxRecords} more rows</td></tr></tfoot>`;
             }
             
             tableHTML += '</table>';
