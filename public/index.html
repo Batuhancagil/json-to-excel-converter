@@ -2348,11 +2348,19 @@
                                 return null;
                             }).filter(val => val !== null);
                         } else {
-                            // Orta parça ise, array'deki ilk elemandan devam et
-                            if (current.length > 0 && current[0] && typeof current[0] === 'object') {
-                                current = current[0][part];
-                            } else {
+                            // Orta parça ise, array'deki tüm elemanlardan bu değeri al
+                            const nextValues = current.map(item => {
+                                if (item && typeof item === 'object' && item[part] !== undefined) {
+                                    return item[part];
+                                }
                                 return null;
+                            }).filter(val => val !== null);
+                            
+                            // Eğer sonraki değerler de array ise, onları birleştir
+                            if (nextValues.length > 0 && Array.isArray(nextValues[0])) {
+                                current = nextValues.flat();
+                            } else {
+                                current = nextValues;
                             }
                         }
                     } else if (current && typeof current === 'object' && current[part] !== undefined) {
