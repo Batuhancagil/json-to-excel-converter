@@ -1142,6 +1142,8 @@
                                 const jsonData = JSON.parse(content);
                                 // Direkt backend'e gönder
                                 sendToBackend(content, jsonData);
+                                // JSON textarea'yı temizle (büyük veriler browser'ı yavaşlatmasın)
+                                document.getElementById('jsonInput').value = '';
                                 showStatus(`${file.name} ${translations[currentLanguage].fileUploadedSuccessfully}`, 'success');
                             } catch (error) {
                                 showStatus(translations[currentLanguage].txtFileInvalidJson + ': ' + error.message, 'error');
@@ -1175,6 +1177,8 @@
                             const jsonData = JSON.parse(content);
                             // Direkt backend'e gönder
                             sendToBackend(content, jsonData);
+                            // JSON textarea'yı temizle (büyük veriler browser'ı yavaşlatmasın)
+                            document.getElementById('jsonInput').value = '';
                             showStatus(`${file.name} ${translations[currentLanguage].fileUploadedSuccessfully}`, 'success');
                         } catch (error) {
                             showStatus('TXT dosyası geçerli JSON formatında olmalıdır: ' + error.message, 'error');
@@ -1267,6 +1271,9 @@
                     console.log('availableFields:', availableFields);
                     console.log('selectionHistory:', selectionHistory);
                     console.log('templates:', templates);
+                    
+                    // JSON textarea'yı temizle (büyük veriler browser'ı yavaşlatmasın)
+                    document.getElementById('jsonInput').value = '';
                     
                     showStatus(data.message, 'success');
                     showStats(jsonData);
